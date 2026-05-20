@@ -140,6 +140,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightboxCaption = lightbox.querySelector('.lightbox-caption');
     const lightboxClose = lightbox.querySelector('.lightbox-close');
 
+    const openLightbox = (img) => {
+        if (!img) return;
+        lightboxImg.src = img.src;
+        lightboxCaption.textContent = img.alt || 'Artwork Masterpiece';
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
     // Attach click events to all portfolio images
     const setupLightboxTriggers = () => {
         // Support both revamped grid images and legacy layout images
@@ -148,13 +156,21 @@ document.addEventListener('DOMContentLoaded', () => {
         galleryImages.forEach(img => {
             img.style.cursor = 'zoom-in';
             img.addEventListener('click', () => {
-                lightboxImg.src = img.src;
-                lightboxCaption.textContent = img.alt || 'Artwork Masterpiece';
-                lightbox.classList.add('active');
-                document.body.style.overflow = 'hidden';
+                openLightbox(img);
             });
         });
     };
+
+    // Make dynamically rendered gallery cards clickable, including the overlay "view" area.
+    document.addEventListener('click', (event) => {
+        const galleryItem = event.target.closest('.gallery-item');
+        if (!galleryItem) return;
+
+        const itemImage = galleryItem.querySelector('img');
+        if (itemImage) {
+            openLightbox(itemImage);
+        }
+    });
 
     setupLightboxTriggers();
 

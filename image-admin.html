@@ -884,6 +884,12 @@
                 return categoryDisplayMap[normalizeCategory(value)] || value || 'Uncategorized';
             }
 
+            function normalizeArtworkKey(category, title) {
+                const normalizedCategory = getDisplayCategory(category).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+                const normalizedTitle = (title || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+                return `${normalizedCategory}||${normalizedTitle}`;
+            }
+
             function formatDate(value) {
                 if (!value) return '--';
                 const date = new Date(value);
@@ -1069,11 +1075,11 @@
                         // ignore; manifest may not exist
                     }
 
-                    // Avoid duplicates: if DB already references the same image_path, prefer DB
-                    const dbPaths = new Set(dbImages.map((i) => i.image_path));
+                    // Avoid duplicates by artwork identity, not just storage path.
+                    const dbArtworkKeys = new Set(dbImages.map((image) => normalizeArtworkKey(image.category, image.title)));
                     const merged = [...dbImages];
                     for (const li of localImages) {
-                        if (!dbPaths.has(li.image_path)) {
+                        if (!dbArtworkKeys.has(normalizeArtworkKey(li.category, li.title))) {
                             merged.push({ id: `local-${li.image_path}`, title: li.title || '', category: li.category || '', image_path: li.image_path, created_at: li.created_at || null, source: 'local' });
                         }
                     }

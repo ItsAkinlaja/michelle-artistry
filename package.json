@@ -1,4 +1,10 @@
 {
+  "name": "michelle-artistry",
+  "private": true,
+  "scripts": {
+    "build": "node build-static.js",
+    "vercel-build": "node build-static.js"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1"
   }
