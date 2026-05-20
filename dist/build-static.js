@@ -36,6 +36,14 @@ async function main() {
     await copyEntry(path.join(rootDir, entry.name), path.join(outputDir, entry.name));
   }
 
+  // If ADMIN credentials are provided via env vars (CI), emit admin-creds.json into dist
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (adminEmail && adminPassword) {
+    const creds = { email: String(adminEmail), password: String(adminPassword) };
+    await fs.promises.writeFile(path.join(outputDir, 'admin-creds.json'), JSON.stringify(creds, null, 2), { mode: 0o600 });
+  }
+
   console.log(`Static build complete: ${outputDir}`);
 }
 
