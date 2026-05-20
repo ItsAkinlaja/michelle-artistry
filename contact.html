@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & Commissions | Michelle Artistry</title>
+    <meta name="description" content="Book a custom digital illustration, character design sheet, or brand logo. Calculate pricing and get in touch with Michelle Artistry.">
+    <link rel="canonical" href="https://michelle-artistry.vercel.app/contact.html">
+    <meta name="robots" content="index,follow">
+    <meta property="og:title" content="Contact & Commissions — Michelle Artistry">
+    <meta property="og:description" content="Book a custom digital illustration, character design sheet, or brand logo. Calculate pricing and get in touch with Michelle Artistry.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://michelle-artistry.vercel.app/contact.html">
+    <meta property="og:image" content="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-05-20_at_14.15.25-removebg-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contact & Commissions — Michelle Artistry">
+    <meta name="twitter:description" content="Book a custom digital illustration, character design sheet, or brand logo. Calculate pricing and get in touch with Michelle Artistry.">
+    <meta name="twitter:image" content="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-05-20_at_14.15.25-removebg-preview.png">
+    <link rel="icon" href="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-05-20_at_14.15.25-removebg-preview.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-05-20_at_14.15.25-removebg-preview.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Glassmorphic Header Navigation -->
+    <nav id="navbar" class="scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo"><img src="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-05-20_at_14.15.25-removebg-preview.png" alt="Michelle Artistry Logo" class="nav-logo-img"></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="testimonials.html">Testimonials</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="mobile-menu-toggle">
+                <div class="hamburger"></div>
+                <div class="hamburger"></div>
+                <div class="hamburger"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu">
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="testimonials.html">Testimonials</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+        <div class="page-header">
+            <h1>Let's Create Something <span class="text-gradient-cyan">Legendary</span></h1>
+            <p>Ready to bring your projects to life? Book a commission or drop a message.</p>
+        </div>
+
+        <div class="contact-grid">
+            
+            <!-- Left Panel: Social & Support channels -->
+            <div class="contact-info-panel">
+                <h2>Direct Channels</h2>
+                <p>Feel free to reach out directly through email or follow my ongoing sketches on social platforms. I usually respond within 24–48 hours for new creative requests.</p>
+                
+                <div class="contact-channels">
+                    <!-- Email Link -->
+                    <a href="mailto:michelleartistry992@gmail.com" target="_blank" class="channel-card glass-panel">
+                        <div class="channel-icon-wrapper">✉</div>
+                        <div class="channel-info">
+                            <h4>Direct Email</h4>
+                            <p>michelleartistry992@gmail.com</p>
+                        </div>
+                    </a>
+
+                    <!-- Twitter Link -->
+                    <a href="https://x.com/michwalls_art" target="_blank" class="channel-card glass-panel">
+                        <div class="channel-icon-wrapper">𝕏</div>
+                        <div class="channel-info">
+                            <h4>Twitter / X</h4>
+                            <p>@michwalls_art</p>
+                        </div>
+                    </a>
+
+                    <!-- LinkedIn -->
+                    <a href="#linkedin" class="channel-card glass-panel">
+                        <div class="channel-icon-wrapper">in</div>
+                        <div class="channel-info">
+                            <h4>LinkedIn</h4>
+                            <p>Michelle Artistry Profile</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Support Section (Ko-fi) -->
+                <div class="kofi-section glass-panel">
+                    <p style="margin: 0; font-size: 0.95rem;">If you enjoy my work, consider buying me a coffee! Every tip directly supports my personal illustration projects.</p>
+                    <a href="https://ko-fi.com/michelleartisty" target="_blank" class="kofi-btn">
+                        <img src="https://storage.ko-fi.com/cdn/logomarkLogo.png" height="20" alt="Ko-fi logomark">
+                        <span>Tip on Ko-fi</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Panel: Commission Calculator -->
+            <div class="calculator-panel glass-panel">
+                <h3>Commission Price Estimator</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px;">Select commission specifications to receive an instant base pricing tier estimate.</p>
+                
+                <form id="commission-form">
+                    
+                    <!-- Artwork Category Select -->
+                    <div class="form-group">
+                        <label for="art-type">Commission Style</label>
+                        <select id="art-type" class="form-control">
+                            <option value="character-design">Character Design sheet</option>
+                            <option value="manga-art" selected>Manga art panel</option>
+                            <option value="comics-storyboard">Comics & storyboard sequential</option>
+                            <option value="book-cover">Book cover illustration</option>
+                            <option value="children-book">Children's book illustration</option>
+                            <option value="portrait">Portrait illustration & drawing</option>
+                            <option value="fan-art">Stylized Fan Art piece</option>
+                            <option value="logos">Custom vector Logo / Brand design</option>
+                        </select>
+                    </div>
+
+                    <!-- Complexity Slider -->
+                    <div class="form-group">
+                        <label for="complexity">Complexity / Shading Style</label>
+                        <div class="price-slider-wrapper">
+                            <input type="range" id="complexity" min="1" max="3" value="2" step="1" style="width: 100%; accent-color: var(--primary);">
+                            <div class="slider-labels">
+                                <span>Basic</span>
+                                <span id="complexity-value" style="color: var(--secondary); font-weight: 500;">Standard (Full Shade / Details)</span>
+                                <span>Complex</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instant Estimate output -->
+                    <div class="price-display">
+                        <p>Estimated Base Price Reference</p>
+                        <div class="price-value" id="estimated-price">$135</div>
+                    </div>
+
+                    <button type="button" id="start-commission-btn" class="btn btn-primary" style="width: 100%;">
+                        <span>✉ Send Commission Inquiry</span>
+                    </button>
+                    
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+        <!-- Global Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                
+                <!-- Column 1: Brand & Intro -->
+                <div class="footer-brand-col">
+                    <a href="index.html" class="logo"><img src="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-05-20_at_14.15.25-removebg-preview.png" alt="Michelle Artistry Logo" class="footer-logo-img"></a>
+                    <p class="footer-bio-summary">A professional digital illustrator crafting futuristic concepts, high-fidelity character designs, and immersive cover art. Let's build worlds together.</p>
+                    <div class="footer-socials">
+                        <a href="https://instagram.com" target="_blank" class="social-icon">Instagram</a>
+                        <a href="https://artstation.com" target="_blank" class="social-icon">ArtStation</a>
+                        <a href="https://twitter.com" target="_blank" class="social-icon">Twitter</a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Navigation Links -->
+                <div class="footer-links-col">
+                    <h3>Explore</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Me</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="testimonials.html">Testimonials</a></li>
+                        <li><a href="contact.html">Commissions</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Showcase Galleries -->
+                <div class="footer-links-col">
+                    <h3>Galleries</h3>
+                    <ul>
+                        <li><a href="chr-design.html">Character Sheets</a></li>
+                        <li><a href="bookcover.html">Book Covers</a></li>
+                        <li><a href="str-brd.html">Storyboards & Comics</a></li>
+                        <li><a href="Manga.html">Manga Panels</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Location/Contact Info -->
+                <div class="footer-contact-col">
+                    <h3>Get In Touch</h3>
+                    <p>Interested in hiring me or getting custom artwork? Feel free to reach out directly.</p>
+                    <a href="contact.html" class="btn btn-secondary btn-small" style="margin-top: 15px; padding: 8px 20px; font-size: 0.85rem;">Get Estimation</a>
+                </div>
+
+            </div>
+
+            <div class="footer-copyright-bar">
+                <p>&copy; 2026 Michelle Artistry. All rights reserved. Designed for Visual Excellence.</p>
+                <p class="footer-credit">Website designed and developed by <a href="https://akinlaja.netlify.app" target="_blank" rel="noopener">Akinlaja</a></p>
+                <div class="footer-legal-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+        <!-- Project Config & App Scripts -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

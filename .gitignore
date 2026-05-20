@@ -1,0 +1,7 @@
+.env
+.env.local
+admin-creds.json
+node_modules/
+.vercel/
+.DS_Store
+*.log

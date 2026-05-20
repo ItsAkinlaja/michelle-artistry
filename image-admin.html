@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michelle Artistry | Admin Dashboard</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body.admin-page {
+            background:
+                radial-gradient(circle at top left, rgba(201, 152, 24, 0.18), transparent 34%),
+                radial-gradient(circle at top right, rgba(0, 245, 212, 0.12), transparent 28%),
+                linear-gradient(180deg, #070913 0%, #05060d 100%);
+            min-height: 100vh;
+        }
+
+        .admin-page .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .admin-shell {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 24px 72px;
+        }
+
+        .admin-hero {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            align-items: stretch;
+            margin-bottom: 24px;
+        }
+
+        .hero-card,
+        .panel-card,
+        .login-card {
+            background: rgba(13, 17, 34, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 24px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+        }
+
+        .hero-card {
+            position: relative;
+            overflow: hidden;
+            padding: 32px;
+            min-height: 300px;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            inset: -40% auto auto -20%;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(201, 152, 24, 0.18), transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            inset: auto -60px -60px auto;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(0, 245, 212, 0.12), transparent 70%);
+            pointer-events: none;
+        }
+
+        .admin-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            margin-top: 18px;
+            font-size: clamp(2.4rem, 5vw, 4.4rem);
+            line-height: 0.96;
+            max-width: 12ch;
+        }
+
+        .hero-copy {
+            margin-top: 18px;
+            max-width: 62ch;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .hero-pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .login-card {
+            padding: 28px;
+        }
+
+        .login-card h2,
+        .panel-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        .login-card p,
+        .panel-card .panel-copy {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .login-grid {
+            display: grid;
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .login-grid .field label,
+        .upload-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-family: var(--font-heading);
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .input,
+        .select,
+        .textarea {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(7, 9, 19, 0.72);
+            color: var(--text-main);
+            padding: 14px 16px;
+            font-family: var(--font-body);
+            font-size: 0.98rem;
+            outline: none;
+            transition: var(--transition-fast);
+        }
+
+        .input:focus,
+        .select:focus,
+        .textarea:focus {
+            border-color: rgba(201, 152, 24, 0.5);
+            box-shadow: 0 0 0 3px rgba(201, 152, 24, 0.12);
+        }
+
+        .textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
+
+        .dashboard {
+            display: none;
+            gap: 24px;
+        }
+
+        .dashboard.visible {
+            display: grid;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            border-radius: 20px;
+            background: linear-gradient(160deg, rgba(13, 17, 34, 0.88), rgba(13, 17, 34, 0.56));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .stat-value {
+            margin-top: 10px;
+            font-size: 2rem;
+            font-family: var(--font-heading);
+        }
+
+        .stat-note {
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 24px;
+        }
+
+        .panel-card {
+            padding: 24px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .panel-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .chip {
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-family: var(--font-heading);
+            font-size: 0.88rem;
+        }
+
+        .chip.active,
+        .chip:hover {
+            color: #fff;
+            border-color: rgba(201, 152, 24, 0.4);
+            background: rgba(201, 152, 24, 0.12);
+        }
+
+        .status {
+            padding: 14px 16px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.22);
+            color: #b7f7cb;
+        }
+
+        .status.error {
+            background: rgba(248, 113, 113, 0.12);
+            border: 1px solid rgba(248, 113, 113, 0.24);
+            color: #fecaca;
+        }
+
+        .status.loading {
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.22);
+            color: #dbeafe;
+        }
+
+        .upload-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .upload-zone {
+            border: 1px dashed rgba(255, 255, 255, 0.16);
+            border-radius: 20px;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .upload-zone-title {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+
+        .upload-zone-copy {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 14px;
+        }
+
+        .file-name {
+            color: #d4d4d8;
+            font-size: 0.92rem;
+            margin-top: 10px;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .actions-row .btn,
+        .panel-actions .btn {
+            min-width: 140px;
+        }
+
+        .gallery-top {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 16px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            aspect-ratio: 1 / 1.15;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gallery-media {
+            position: relative;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .gallery-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 14px;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.78) 100%);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            gap: 12px;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .gallery-meta {
+            min-width: 0;
+        }
+
+        .gallery-title {
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .gallery-subtitle {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        .gallery-footer {
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .gallery-category {
+            color: var(--text-muted);
+            font-size: 0.84rem;
+        }
+
+        .gallery-empty {
+            grid-column: 1 / -1;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: #fff;
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .loading-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 999px;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-top-color: #fff;
+            animation: spin 0.9s linear infinite;
+        }
+
+        .quick-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .quick-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .quick-item strong {
+            display: block;
+            font-family: var(--font-heading);
+            margin-bottom: 4px;
+        }
+
+        .quick-item span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 6, 15, 0.72);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-card {
+            width: min(100%, 460px);
+            border-radius: 24px;
+            background: rgba(13, 17, 34, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+            padding: 24px;
+        }
+
+        .modal-card p {
+            color: var(--text-main);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 1100px) {
+            .admin-hero,
+            .dashboard-grid,
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .admin-shell {
+                padding-top: 104px;
+            }
+
+            .admin-hero,
+            .dashboard-grid,
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-card,
+            .login-card,
+            .panel-card {
+                border-radius: 20px;
+            }
+
+            .panel-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="admin-page">
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-05-20_at_14.15.25-removebg-preview.png" alt="Michelle Artistry Logo" class="nav-logo-img">
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="image-admin.html" class="active">Admin Dashboard</a></li>
+            </ul>
+            <div class="mobile-menu-toggle">
+                <div class="hamburger"></div>
+                <div class="hamburger"></div>
+                <div class="hamburger"></div>
+            </div>
+        </div>
+    </nav>
+
+    <style>
+        /* Keep top nav visible but non-obstructive */
+        #navbar { position: sticky; top: 0; z-index: 1200; backdrop-filter: blur(6px); }
+        @media (max-width: 860px) {
+            .admin-shell { padding-top: 84px; }
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .gallery-item { aspect-ratio: 1 / 1.05; }
+        }
+    </style>
+
+    <main class="admin-shell">
+        <section class="admin-hero">
+            <div class="hero-card glass-panel">
+                <div class="admin-kicker">Private CMS</div>
+                <h1 class="hero-title">Artwork Dashboard for <span class="text-gradient-cyan">Michelle Artistry</span></h1>
+                <p class="hero-copy">Upload new portfolio images, review the full library, and delete assets with storage cleanup from a single branded dashboard. This page uses a simple local admin login, not Supabase auth.</p>
+                <div class="hero-meta">
+                    <div class="hero-pill">Image upload</div>
+                    <div class="hero-pill">Library CMS</div>
+                    <div class="hero-pill">Storage delete cleanup</div>
+                    <div class="hero-pill">Homepage visual style</div>
+                </div>
+            </div>
+
+            <div class="login-card">
+                <div id="loginPanel">
+                    <h2>Admin Login</h2>
+                    <p>Use the local admin credentials to open the dashboard.</p>
+                    <div id="authStatus" class="status"></div>
+                    <form id="loginForm" class="login-grid">
+                        <div class="field">
+                            <label for="authEmail">Email</label>
+                            <input id="authEmail" class="input" type="email" placeholder="admin@michelleartistry.com" autocomplete="username" required>
+                        </div>
+                        <div class="field">
+                            <label for="authPassword">Password</label>
+                            <input id="authPassword" class="input" type="password" placeholder="Password" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                    </form>
+                </div>
+
+                <div id="userPanel" class="hidden">
+                    <h2>Signed In</h2>
+                    <p>Dashboard access is active. You can now manage the gallery.</p>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:12px;flex-wrap:wrap;">
+                        <div>
+                            <div style="color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;">Current admin</div>
+                            <div id="currentAdmin" style="margin-top:6px;font-family:var(--font-heading);font-size:1.05rem;"></div>
+                        </div>
+                        <button id="logoutBtn" type="button" class="btn btn-ghost">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="dashboard">
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total artworks</div>
+                    <div id="statTotal" class="stat-value">0</div>
+                    <div class="stat-note">Synced from the portfolio library.</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Categories</div>
+                    <div id="statCategories" class="stat-value">0</div>
+                    <div class="stat-note">Unique collections in storage.</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Visible filter</div>
+                    <div id="statFilter" class="stat-value">All</div>
+                    <div class="stat-note">Current CMS view scope.</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Last update</div>
+                    <div id="statLatest" class="stat-value">--</div>
+                    <div class="stat-note">Most recent upload timestamp.</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <section class="panel-card">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Upload Artwork</h3>
+                            <p class="panel-copy">Add a new image to the public gallery and write the database row at the same time.</p>
+                        </div>
+                        <div class="panel-actions">
+                            <button id="refreshBtn" type="button" class="btn btn-ghost">Refresh Library</button>
+                        </div>
+                    </div>
+
+                    <div id="uploadStatus" class="status"></div>
+
+                    <form id="uploadForm" class="upload-form">
+                        <div>
+                            <label for="titleInput">Artwork Title</label>
+                            <input id="titleInput" class="input" type="text" placeholder="Enter artwork title">
+                        </div>
+
+                        <div>
+                            <label for="categoryInput">Category</label>
+                            <select id="categoryInput" class="select" required>
+                                <option value="" selected disabled>Select a category</option>
+                                <option value="Comics">Comics & Storyboards</option>
+                                <option value="Character design">Character Design</option>
+                                <option value="portrait">Portrait Illustration</option>
+                                <option value="book cover">Book Covers</option>
+                                <option value="manga">Manga Art</option>
+                                <option value="fan art">Fan Art</option>
+                                <option value="Children book illustration">Children's Books</option>
+                                <option value="NSFW">NSFW Artwork</option>
+                                <option value="Logos">Logos & Branding</option>
+                            </select>
+                        </div>
+
+                        <div class="upload-zone">
+                            <div class="upload-zone-title">Image File</div>
+                            <div class="upload-zone-copy">Choose a JPG, PNG, or WEBP file. The image is uploaded to storage and indexed in the CMS.</div>
+                            <input id="imageInput" class="input" type="file" accept="image/*" required>
+                            <div id="fileInfo" class="file-name">No file selected.</div>
+                        </div>
+
+                        <div>
+                            <label for="noteInput">Admin Note</label>
+                            <textarea id="noteInput" class="textarea" placeholder="Optional internal note for this upload"></textarea>
+                        </div>
+
+                        <div class="actions-row">
+                            <button id="uploadBtn" type="submit" class="btn btn-primary" disabled>Upload to Gallery</button>
+                            <button id="clearBtn" type="button" class="btn btn-ghost" disabled>Clear Form</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="panel-card">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Library Manager</h3>
+                            <p class="panel-copy">Search, filter, and delete images from the live portfolio collection.</p>
+                        </div>
+                        <div class="panel-actions">
+                            <input id="searchInput" class="input" type="search" placeholder="Search titles">
+                        </div>
+                    </div>
+
+                    <div class="toolbar" id="filterBar">
+                        <button type="button" class="chip active" data-filter="all">All</button>
+                        <button type="button" class="chip" data-filter="Comics">Comics</button>
+                        <button type="button" class="chip" data-filter="Character design">Character Design</button>
+                        <button type="button" class="chip" data-filter="portrait">Portraits</button>
+                        <button type="button" class="chip" data-filter="book cover">Book Covers</button>
+                        <button type="button" class="chip" data-filter="manga">Manga</button>
+                    </div>
+
+                    <div id="galleryStatus" class="status loading show"><span class="loading-dot"></span> Loading library…</div>
+                    <div id="galleryGrid" class="gallery-grid"></div>
+                </section>
+            </div>
+
+            <section class="panel-card">
+                <div class="panel-header">
+                    <div>
+                        <h3>Quick CMS Notes</h3>
+                        <p class="panel-copy">A short operational checklist for daily image management.</p>
+                    </div>
+                </div>
+
+                <div class="quick-list">
+                    <div class="quick-item">
+                        <div>
+                            <strong>Upload first, then publish</strong>
+                            <span>Every upload writes to storage and the artworks table together.</span>
+                        </div>
+                        <div class="hero-pill">Storage + DB</div>
+                    </div>
+                    <div class="quick-item">
+                        <div>
+                            <strong>Delete removes files too</strong>
+                            <span>Deleting an item clears the storage object to avoid wasted space.</span>
+                        </div>
+                        <div class="hero-pill">Cleanup</div>
+                    </div>
+                    <div class="quick-item">
+                        <div>
+                            <strong>Local admin access only</strong>
+                            <span>Sign in uses the credentials stored in admin-creds.json.</span>
+                        </div>
+                        <div class="hero-pill">Private</div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div id="confirmModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="modal-actions">
+                <button id="confirmCancel" type="button" class="btn btn-ghost">Cancel</button>
+                <button id="confirmOk" type="button" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="messageModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <p id="messageText">Message</p>
+            <div class="modal-actions">
+                <button id="messageOk" type="button" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const config = window.CONFIG || {
+                SUPABASE_URL: 'https://lhejyxhllenegcebodzr.supabase.co',
+                SUPABASE_ANON_KEY: 'sb_publishable_Z4VzOY99QtYxbZ9qS0n_dA_EjmKM7_B'
+            };
+
+            const supabase = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+
+            const categoryDisplayMap = {
+                Comics: 'Comics & Storyboards',
+                'Character design': 'Character Design',
+                portrait: 'Portrait Illustration',
+                'book cover': 'Book Covers',
+                manga: 'Manga Art',
+                'fan art': 'Fan Art',
+                'Children book illustration': "Children's Books",
+                NSFW: 'NSFW Artwork',
+                Logos: 'Logos & Branding'
+            };
+
+            const categoryPathMap = Object.fromEntries(Object.entries(categoryDisplayMap).map(([key, value]) => [value, key]));
+
+            const state = {
+                authed: false,
+                adminEmail: '',
+                allImages: [],
+                filter: 'all',
+                search: '',
+                backendReady: true
+            };
+
+            const imagekitEndpoint = (window.CONFIG && window.CONFIG.IMAGEKIT_URL_ENDPOINT) || 'https://ik.imagekit.io/scmchurch';
+
+            const dom = {
+                loginPanel: document.getElementById('loginPanel'),
+                userPanel: document.getElementById('userPanel'),
+                loginForm: document.getElementById('loginForm'),
+                authEmail: document.getElementById('authEmail'),
+                authPassword: document.getElementById('authPassword'),
+                authStatus: document.getElementById('authStatus'),
+                currentAdmin: document.getElementById('currentAdmin'),
+                dashboard: document.getElementById('dashboard'),
+                uploadForm: document.getElementById('uploadForm'),
+                uploadBtn: document.getElementById('uploadBtn'),
+                clearBtn: document.getElementById('clearBtn'),
+                refreshBtn: document.getElementById('refreshBtn'),
+                uploadStatus: document.getElementById('uploadStatus'),
+                galleryStatus: document.getElementById('galleryStatus'),
+                galleryGrid: document.getElementById('galleryGrid'),
+                titleInput: document.getElementById('titleInput'),
+                categoryInput: document.getElementById('categoryInput'),
+                imageInput: document.getElementById('imageInput'),
+                fileInfo: document.getElementById('fileInfo'),
+                noteInput: document.getElementById('noteInput'),
+                searchInput: document.getElementById('searchInput'),
+                statTotal: document.getElementById('statTotal'),
+                statCategories: document.getElementById('statCategories'),
+                statFilter: document.getElementById('statFilter'),
+                statLatest: document.getElementById('statLatest'),
+                confirmModal: document.getElementById('confirmModal'),
+                confirmMessage: document.getElementById('confirmMessage'),
+                confirmOk: document.getElementById('confirmOk'),
+                confirmCancel: document.getElementById('confirmCancel'),
+                messageModal: document.getElementById('messageModal'),
+                messageText: document.getElementById('messageText'),
+                messageOk: document.getElementById('messageOk'),
+                logoutBtn: document.getElementById('logoutBtn')
+            };
+
+            function showStatus(element, message, kind = 'loading') {
+                element.textContent = message;
+                element.className = `status show ${kind}`;
+            }
+
+            function clearStatus(element) {
+                element.className = 'status';
+                element.textContent = '';
+            }
+
+            function setDashboardVisible(visible) {
+                dom.dashboard.classList.toggle('visible', visible);
+            }
+
+            function updateAuthUI() {
+                dom.loginPanel.classList.toggle('hidden', state.authed);
+                dom.userPanel.classList.toggle('hidden', !state.authed);
+                setDashboardVisible(state.authed);
+                dom.uploadBtn.disabled = !state.authed;
+                dom.clearBtn.disabled = !state.authed;
+                if (state.authed) {
+                    dom.currentAdmin.textContent = state.adminEmail;
+                }
+            }
+
+            function normalizeCategory(value) {
+                return categoryDisplayMap[value] ? value : (categoryPathMap[value] || value || '');
+            }
+
+            function getDisplayCategory(value) {
+                return categoryDisplayMap[normalizeCategory(value)] || value || 'Uncategorized';
+            }
+
+            function formatDate(value) {
+                if (!value) return '--';
+                const date = new Date(value);
+                return Number.isNaN(date.getTime()) ? '--' : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            }
+
+            function syncStats() {
+                dom.statTotal.textContent = String(state.allImages.length);
+                dom.statCategories.textContent = String(new Set(state.allImages.map((image) => getDisplayCategory(image.category))).size);
+                dom.statFilter.textContent = state.filter === 'all' ? 'All' : getDisplayCategory(state.filter);
+                dom.statLatest.textContent = state.allImages[0]?.created_at ? formatDate(state.allImages[0].created_at) : '--';
+            }
+
+            function getFilteredImages() {
+                const search = state.search.trim().toLowerCase();
+                return state.allImages.filter((image) => {
+                    const normalizedCategory = normalizeCategory(image.category);
+                    const matchesFilter = state.filter === 'all' || normalizedCategory === state.filter || getDisplayCategory(image.category) === getDisplayCategory(state.filter);
+                    const matchesSearch = !search || (image.title || '').toLowerCase().includes(search);
+                    return matchesFilter && matchesSearch;
+                });
+            }
+
+            function renderGallery() {
+                const images = getFilteredImages();
+                dom.galleryGrid.innerHTML = '';
+
+                if (!images.length) {
+                    dom.galleryGrid.innerHTML = '<div class="gallery-empty">No artworks match this view.</div>';
+                    return;
+                }
+
+                images.forEach((image) => {
+                    const item = document.createElement('article');
+                    item.className = 'gallery-item';
+
+                    const media = document.createElement('div');
+                    media.className = 'gallery-media';
+
+                    const img = document.createElement('img');
+                    img.loading = 'lazy';
+                    img.alt = image.title || 'Artwork';
+
+                    // For local files (served by the dev server) show direct path
+                    if (image.source === 'local') {
+                        img.src = `/${image.image_path}`;
+                    } else {
+                        // Try ImageKit CDN first, then fall back to Supabase public storage, then placeholder
+                        let triedSupabase = false;
+                        const ikUrl = imagekitEndpoint.replace(/\/$/, '') + '/artworks/' + encodeURI(image.image_path) + '?tr=w-800,q-85';
+                        const supaUrl = `${config.SUPABASE_URL}/storage/v1/object/public/artworks/${encodeURI(image.image_path)}`;
+                        img.src = ikUrl;
+                        img.onerror = () => {
+                            if (!triedSupabase) {
+                                triedSupabase = true;
+                                img.src = supaUrl;
+                                return;
+                            }
+                            img.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22720%22 height=%22900%22 viewBox=%220 0 720 900%22%3E%3Crect width=%22720%22 height=%22900%22 fill=%230d1122/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%2394a3b8%22 font-family=%22Arial%22 font-size=%2228%22%3EImage unavailable%3C/text%3E%3C/svg%3E';
+                        };
+                    }
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'gallery-overlay';
+
+                    const overlayMeta = document.createElement('div');
+                    overlayMeta.className = 'gallery-meta';
+
+                    const title = document.createElement('div');
+                    title.className = 'gallery-title';
+                    title.textContent = image.title || 'Untitled';
+
+                    const subtitle = document.createElement('div');
+                    subtitle.className = 'gallery-subtitle';
+                    subtitle.textContent = formatDate(image.created_at);
+
+                    overlayMeta.append(title, subtitle);
+
+                    const overlayDelete = document.createElement('button');
+                    overlayDelete.type = 'button';
+                    overlayDelete.className = 'btn btn-danger';
+                    overlayDelete.textContent = image.source === 'local' ? 'Local' : 'Delete';
+                    if (image.source === 'local') {
+                        overlayDelete.disabled = true;
+                        overlayDelete.title = 'Local file - manage via filesystem';
+                        overlayDelete.classList.add('btn-ghost');
+                    } else {
+                        overlayDelete.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            deleteImage(image.id, image.image_path);
+                        });
+                    }
+
+                    overlay.append(overlayMeta, overlayDelete);
+                    media.append(img, overlay);
+
+                    const footer = document.createElement('div');
+                    footer.className = 'gallery-footer';
+
+                    const footerMeta = document.createElement('div');
+                    const footerTitle = document.createElement('div');
+                    footerTitle.className = 'gallery-title';
+                    footerTitle.textContent = image.title || 'Untitled';
+
+                    const footerCategory = document.createElement('div');
+                    footerCategory.className = 'gallery-category';
+                    footerCategory.textContent = getDisplayCategory(image.category);
+
+                    footerMeta.append(footerTitle, footerCategory);
+
+                    const footerDelete = document.createElement('button');
+                    footerDelete.type = 'button';
+                    footerDelete.className = image.source === 'local' ? 'btn btn-ghost' : 'btn btn-danger';
+                    footerDelete.textContent = image.source === 'local' ? 'Local' : 'Delete';
+                    if (image.source !== 'local') footerDelete.addEventListener('click', () => deleteImage(image.id, image.image_path));
+
+                    footer.append(footerMeta, footerDelete);
+                    item.append(media, footer);
+                    dom.galleryGrid.appendChild(item);
+                });
+            }
+
+            async function loadCredentials() {
+                const response = await fetch('/admin-creds.json', { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error('admin-creds.json is missing or not reachable');
+                }
+                return response.json();
+            }
+
+            async function signIn(email, password) {
+                showStatus(dom.authStatus, 'Verifying credentials…', 'loading');
+                const creds = await loadCredentials();
+
+                const validEmail = String(email).trim().toLowerCase() === String(creds.email || '').trim().toLowerCase();
+                const validPassword = String(password) === String(creds.password || '');
+
+                if (!validEmail || !validPassword) {
+                    throw new Error('Invalid login credentials');
+                }
+
+                state.authed = true;
+                state.adminEmail = creds.email;
+                clearStatus(dom.authStatus);
+                updateAuthUI();
+                showStatus(dom.uploadStatus, 'Signed in successfully.', 'success');
+                await loadImages();
+            }
+
+            async function signOut() {
+                state.authed = false;
+                state.adminEmail = '';
+                updateAuthUI();
+                state.allImages = [];
+                dom.galleryGrid.innerHTML = '';
+                syncStats();
+                showStatus(dom.authStatus, 'Signed out.', 'success');
+            }
+
+            async function loadImages() {
+                if (!state.authed) return;
+
+                showStatus(dom.galleryStatus, 'Loading library…', 'loading');
+                try {
+                    const { data, error } = await supabase
+                        .from('artworks')
+                        .select('id,title,category,image_path,created_at')
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+
+                    // Mark DB-sourced images
+                    const dbImages = (data || []).map((r) => ({ ...r, source: 'supabase' }));
+
+                    // Try to fetch a local manifest of files that exist in the workspace root
+                    let localImages = [];
+                    try {
+                        const resp = await fetch('/public_images.json', { cache: 'no-store' });
+                        if (resp.ok) {
+                            localImages = (await resp.json()) || [];
+                        }
+                    } catch (e) {
+                        // ignore; manifest may not exist
+                    }
+
+                    // Avoid duplicates: if DB already references the same image_path, prefer DB
+                    const dbPaths = new Set(dbImages.map((i) => i.image_path));
+                    const merged = [...dbImages];
+                    for (const li of localImages) {
+                        if (!dbPaths.has(li.image_path)) {
+                            merged.push({ id: `local-${li.image_path}`, title: li.title || '', category: li.category || '', image_path: li.image_path, created_at: li.created_at || null, source: 'local' });
+                        }
+                    }
+
+                    state.allImages = merged;
+                    state.backendReady = true;
+                    syncStats();
+                    renderGallery();
+                    showStatus(dom.galleryStatus, `Loaded ${state.allImages.length} artworks.`, 'success');
+                } catch (error) {
+                    if (String(error.message).includes("Could not find the table 'public.artworks'")) {
+                        state.backendReady = false;
+                        dom.galleryGrid.innerHTML = '<div class="gallery-empty">Supabase is missing the public.artworks table. Create it with the supplied supabase-schema.sql file, then refresh the library.</div>';
+                        showStatus(dom.galleryStatus, 'Backend setup required: public.artworks table is missing.', 'error');
+                        syncStats();
+                        return;
+                    }
+
+                    showStatus(dom.galleryStatus, `Failed to load library: ${error.message}`, 'error');
+                }
+            }
+
+            async function uploadArtwork(event) {
+                event.preventDefault();
+
+                if (!state.authed) {
+                    showStatus(dom.uploadStatus, 'Sign in first.', 'error');
+                    return;
+                }
+
+                if (!state.backendReady) {
+                    showStatus(dom.uploadStatus, 'Backend setup required: create the public.artworks table first.', 'error');
+                    return;
+                }
+
+                const file = dom.imageInput.files[0];
+                const category = dom.categoryInput.value;
+                const title = dom.titleInput.value.trim();
+                const note = dom.noteInput.value.trim();
+
+                if (!file || !category) {
+                    showStatus(dom.uploadStatus, 'Select a category and image file.', 'error');
+                    return;
+                }
+
+                const safeTitle = (title || file.name.replace(/\.[^/.]+$/, '')).trim();
+                const fileExt = file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')) : '';
+                const slug = safeTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'artwork';
+                const storagePath = `${category}/${slug}-${Date.now()}${fileExt}`;
+
+                dom.uploadBtn.disabled = true;
+                dom.uploadBtn.innerHTML = '<span class="loading-dot"></span> Uploading';
+                showStatus(dom.uploadStatus, 'Uploading image and saving CMS record…', 'loading');
+
+                try {
+                    const { error: storageError } = await supabase.storage
+                        .from('artworks')
+                        .upload(storagePath, file, {
+                            cacheControl: '3600',
+                            upsert: false,
+                            contentType: file.type || 'image/jpeg'
+                        });
+
+                    if (storageError) throw storageError;
+
+                    const payload = {
+                        title: safeTitle,
+                        category: getDisplayCategory(category),
+                        image_path: storagePath
+                    };
+
+                    if (note) {
+                        payload.note = note;
+                    }
+
+                    const { error: dbError } = await supabase.from('artworks').insert([payload]);
+
+                    if (dbError) {
+                        await supabase.storage.from('artworks').remove([storagePath]);
+                        throw dbError;
+                    }
+
+                    showStatus(dom.uploadStatus, 'Upload complete.', 'success');
+                    dom.uploadForm.reset();
+                    dom.fileInfo.textContent = 'No file selected.';
+                    await loadImages();
+                } catch (error) {
+                    showStatus(dom.uploadStatus, `Upload failed: ${error.message}`, 'error');
+                } finally {
+                    dom.uploadBtn.disabled = false;
+                    dom.uploadBtn.textContent = 'Upload to Gallery';
+                }
+            }
+
+            async function deleteImage(imageId, imagePath) {
+                if (!state.authed) {
+                    showStatus(dom.uploadStatus, 'Sign in first.', 'error');
+                    return;
+                }
+
+                if (!state.backendReady) {
+                    showStatus(dom.uploadStatus, 'Backend setup required: create the public.artworks table first.', 'error');
+                    return;
+                }
+
+                const confirmed = await showConfirmModal('Delete this image from the gallery and storage?');
+                if (!confirmed) return;
+
+                try {
+                    const { error: storageError } = await supabase.storage.from('artworks').remove([imagePath]);
+                    if (storageError) throw storageError;
+
+                    const { error: dbError } = await supabase.from('artworks').delete().eq('id', imageId);
+                    if (dbError) throw dbError;
+
+                    showStatus(dom.uploadStatus, 'Image deleted.', 'success');
+                    await loadImages();
+                } catch (error) {
+                    showStatus(dom.uploadStatus, `Delete failed: ${error.message}`, 'error');
+                }
+            }
+
+            function showConfirmModal(message) {
+                return new Promise((resolve) => {
+                    dom.confirmMessage.textContent = message;
+                    dom.confirmModal.style.display = 'flex';
+
+                    const cleanup = (result) => {
+                        dom.confirmModal.style.display = 'none';
+                        dom.confirmOk.removeEventListener('click', okHandler);
+                        dom.confirmCancel.removeEventListener('click', cancelHandler);
+                        resolve(result);
+                    };
+
+                    const okHandler = () => cleanup(true);
+                    const cancelHandler = () => cleanup(false);
+
+                    dom.confirmOk.addEventListener('click', okHandler);
+                    dom.confirmCancel.addEventListener('click', cancelHandler);
+                });
+            }
+
+            function showMessageModal(message) {
+                return new Promise((resolve) => {
+                    dom.messageText.textContent = message;
+                    dom.messageModal.style.display = 'flex';
+
+                    const cleanup = () => {
+                        dom.messageModal.style.display = 'none';
+                        dom.messageOk.removeEventListener('click', handler);
+                        resolve();
+                    };
+
+                    const handler = () => cleanup();
+                    dom.messageOk.addEventListener('click', handler);
+                });
+            }
+
+            function applyFilter(filter) {
+                state.filter = filter;
+                dom.statFilter.textContent = filter === 'all' ? 'All' : getDisplayCategory(filter);
+                document.querySelectorAll('.chip').forEach((chip) => {
+                    chip.classList.toggle('active', chip.dataset.filter === filter);
+                });
+                renderGallery();
+            }
+
+            dom.loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                try {
+                    await signIn(dom.authEmail.value, dom.authPassword.value);
+                } catch (error) {
+                    showStatus(dom.authStatus, error.message, 'error');
+                    await showMessageModal(error.message);
+                }
+            });
+
+            dom.logoutBtn.addEventListener('click', signOut);
+            dom.uploadForm.addEventListener('submit', uploadArtwork);
+            dom.refreshBtn.addEventListener('click', loadImages);
+
+            dom.clearBtn.addEventListener('click', () => {
+                dom.uploadForm.reset();
+                dom.fileInfo.textContent = 'No file selected.';
+                showStatus(dom.uploadStatus, 'Form cleared.', 'success');
+            });
+
+            dom.searchInput.addEventListener('input', (event) => {
+                state.search = event.target.value;
+                renderGallery();
+            });
+
+            dom.categoryInput.addEventListener('change', () => {
+                syncStats();
+            });
+
+            dom.imageInput.addEventListener('change', () => {
+                const file = dom.imageInput.files[0];
+                dom.fileInfo.textContent = file ? `${file.name} • ${(file.size / 1024 / 1024).toFixed(2)} MB` : 'No file selected.';
+            });
+
+            document.getElementById('filterBar').addEventListener('click', (event) => {
+                const button = event.target.closest('.chip');
+                if (!button) return;
+                applyFilter(button.dataset.filter);
+            });
+
+            dom.confirmModal.addEventListener('click', (event) => {
+                if (event.target === dom.confirmModal) {
+                    dom.confirmCancel.click();
+                }
+            });
+
+            dom.messageModal.addEventListener('click', (event) => {
+                if (event.target === dom.messageModal) {
+                    dom.messageOk.click();
+                }
+            });
+
+            updateAuthUI();
+            showStatus(dom.authStatus, 'Enter your local admin credentials to open the dashboard.', 'loading');
+        });
+    </script>
+</body>
+</html>

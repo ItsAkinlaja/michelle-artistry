@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=/image-admin.html">
+    <title>Redirecting…</title>
+    <script>window.location.href = '/image-admin.html';</script>
+  </head>
+  <body>
+    Redirecting to admin page… If you are not redirected, <a href="/image-admin.html">click here</a>.
+  </body>
+</html>
+
+            // Upload Submission
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!selectedFile) {
+                    alert('Please select or drag in an image file first.');
+                    return;
+                }
+
+                const title = artworkTitle.value;
+                const category = artworkCategory.value;
+                
+                // Construct clean filename path
+                // E.g., 'manga/uuid-filename.jpg' or 'manga/filename.jpg'
+                // We sanitize name and prepend timestamp/random string to prevent duplicates
+                const fileExt = selectedFile.name.substring(selectedFile.name.lastIndexOf('.'));
+                const sanitizedName = title.toLowerCase()
+                    .replace(/[^a-z0-9]/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+                
+                const uniqueFileName = `${sanitizedName}-${Date.now()}${fileExt}`;
+                
+                // Match category path string
+                // Category options match folder locations:
+                // 'Comics & Storyboards' -> 'Comics'
+                // 'Character Design' -> 'Character design'
+                // 'Portrait Illustration' -> 'portrait'
+                // 'Book Covers' -> 'book cover'
+                // 'Manga Art' -> 'manga'
+                // 'Fan Art' -> 'fan art'
+                // 'Children\'s Books' -> 'Children book illustration'
+                // 'NSFW Artwork' -> 'NSFW'
+                // 'Logos & Branding' -> 'Logos'
+                const categoryFolderMap = {
+                    'Comics & Storyboards': 'Comics',
+                    'Character Design': 'Character design',
+                    'Portrait Illustration': 'portrait',
+                    'Book Covers': 'book cover',
+                    'Manga Art': 'manga',
+                    'Fan Art': 'fan art',
+                    'Children\'s Books': 'Children book illustration',
+                    'NSFW Artwork': 'NSFW',
+                    'Logos & Branding': 'Logos'
+                };
+
+                const folderName = categoryFolderMap[category];
+                const storagePath = `${folderName}/${uniqueFileName}`;
+
+                try {
+                    // Disable submit button during process
+                    uploadSubmitBtn.disabled = true;
+                    uploadSubmitBtn.textContent = 'Publishing...';
+                    progressContainer.style.display = 'block';
+                    progressBar.style.width = '10%';
+                    
+                    log(`Preparing upload for "${title}" in [${category}]...`);
+                    progressBar.style.width = '30%';
+
+                    // 1. Upload file to Supabase Storage bucket named 'artworks'
+                    log(`Uploading asset to Supabase Storage: artworks/${storagePath}...`);
+                    const { data: storageData, error: storageError } = await supabase.storage
+                        .from('artworks')
+                        .upload(storagePath, selectedFile, {
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+
+                    if (storageError) throw storageError;
+                    
+                    progressBar.style.width = '70%';
+                    log("Storage upload successful. Synchronizing database metadata...");
+
+                    // 2. Insert row into database table 'artworks'
+                    const { data: dbData, error: dbError } = await supabase
+                        .from('artworks')
+                        .insert([
+                            { 
+                                title: title,
+                                category: category,
+                                image_path: storagePath
+                            }
+                        ]);
+
+                    if (dbError) throw dbError;
+
+                    progressBar.style.width = '100%';
+                    log(`Successfully published: "${title}" is now live!`);
+                    
+                    setTimeout(() => {
+                        alert(`Successfully Published!\n"${title}" has been added to the ${category} portfolio gallery.`);
+                        // Reset Form
+                        uploadForm.reset();
+                        selectedFile = null;
+                        fileInfo.classList.add('hidden');
+                        progressContainer.style.display = 'none';
+                        progressBar.style.width = '0%';
+                        uploadSubmitBtn.disabled = false;
+                        uploadSubmitBtn.textContent = 'Publish Masterpiece';
+                    }, 800);
+
+                } catch (error) {
+                    log(`Upload failed: ${error.message}`, true);
+                    alert(`Upload Failed: ${error.message}`);
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                    uploadSubmitBtn.disabled = false;
+                    uploadSubmitBtn.textContent = 'Publish Masterpiece';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
