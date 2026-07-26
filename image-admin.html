@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -569,7 +569,7 @@
     <nav id="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <img src="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-05-20_at_14.15.25-removebg-preview.png" alt="Michelle Artistry Logo" class="nav-logo-img">
+                <img src="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-07-25_at_09.45.58-removebg-preview.png" alt="Michelle Artistry Logo" class="nav-logo-img">
             </a>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
@@ -775,6 +775,63 @@
                         <div class="hero-pill">Private</div>
                     </div>
                 </div>
+            </section>
+
+            <!-- ===== REVIEWS MANAGER ===== -->
+            <section class="panel-card" id="reviewsPanel">
+                <div class="panel-header">
+                    <div>
+                        <h3>Reviews Manager</h3>
+                        <p class="panel-copy">Add, toggle visibility, or delete client testimonials shown on the public Testimonials page.</p>
+                    </div>
+                    <div class="panel-actions">
+                        <button id="refreshReviewsBtn" type="button" class="btn btn-ghost">Refresh</button>
+                    </div>
+                </div>
+
+                <div id="reviewStatus" class="status"></div>
+
+                <!-- Add review form -->
+                <form id="reviewForm" class="upload-form" style="margin-bottom:28px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div>
+                            <label for="reviewName">Client Name</label>
+                            <input id="reviewName" class="input" type="text" placeholder="e.g. Sarah Jenkins" required>
+                        </div>
+                        <div>
+                            <label for="reviewRole">Role / Title</label>
+                            <input id="reviewRole" class="input" type="text" placeholder="e.g. Children's Book Publisher" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="reviewText">Review Text</label>
+                        <textarea id="reviewText" class="textarea" placeholder="What did the client say?" required></textarea>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div>
+                            <label for="reviewRating">Star Rating (1–5)</label>
+                            <select id="reviewRating" class="select">
+                                <option value="5" selected>5 ★★★★★</option>
+                                <option value="4">4 ★★★★☆</option>
+                                <option value="3">3 ★★★☆☆</option>
+                                <option value="2">2 ★★☆☆☆</option>
+                                <option value="1">1 ★☆☆☆☆</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="reviewAvatar">Avatar URL <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+                            <input id="reviewAvatar" class="input" type="url" placeholder="https://…">
+                        </div>
+                    </div>
+                    <div class="actions-row">
+                        <button id="addReviewBtn" type="submit" class="btn btn-primary">Add Review</button>
+                        <button id="clearReviewBtn" type="button" class="btn btn-ghost">Clear</button>
+                    </div>
+                </form>
+
+                <!-- Reviews list -->
+                <div id="reviewsLoading" class="status loading show"><span class="loading-dot"></span> Loading reviews&hellip;</div>
+                <div id="reviewsList" style="display:grid;gap:12px;"></div>
             </section>
         </section>
     </main>
@@ -1319,6 +1376,184 @@
 
             updateAuthUI();
             showStatus(dom.authStatus, 'Enter your local admin credentials to open the dashboard.', 'loading');
+
+            // =====================================================
+            // REVIEWS MANAGER
+            // =====================================================
+
+            const reviewsDom = {
+                panel:       document.getElementById('reviewsPanel'),
+                status:      document.getElementById('reviewStatus'),
+                loading:     document.getElementById('reviewsLoading'),
+                list:        document.getElementById('reviewsList'),
+                form:        document.getElementById('reviewForm'),
+                name:        document.getElementById('reviewName'),
+                role:        document.getElementById('reviewRole'),
+                text:        document.getElementById('reviewText'),
+                rating:      document.getElementById('reviewRating'),
+                avatar:      document.getElementById('reviewAvatar'),
+                addBtn:      document.getElementById('addReviewBtn'),
+                clearBtn:    document.getElementById('clearReviewBtn'),
+                refreshBtn:  document.getElementById('refreshReviewsBtn'),
+            };
+
+            let allReviews = [];
+
+            function escHtml(str) {
+                return String(str || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            }
+
+            function buildStarsHtml(rating) {
+                let html = '';
+                for (let i = 1; i <= 5; i++) {
+                    html += `<span style="color:${i <= rating ? 'var(--primary)' : 'rgba(255,255,255,0.2)'}">\u2605</span>`;
+                }
+                return html;
+            }
+
+            function renderReviews() {
+                reviewsDom.list.innerHTML = '';
+                if (!allReviews.length) {
+                    reviewsDom.list.innerHTML = '<div class="gallery-empty">No reviews yet. Add the first one above.</div>';
+                    return;
+                }
+
+                allReviews.forEach((r) => {
+                    const item = document.createElement('div');
+                    item.className = 'quick-item';
+                    item.style.flexDirection = 'column';
+                    item.style.gap = '10px';
+
+                    item.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+                            <div style="min-width:0;">
+                                <strong style="display:block;font-family:var(--font-heading);margin-bottom:2px;">${escHtml(r.name)} <span style="color:var(--text-muted);font-size:0.88rem;font-family:var(--font-body);">&mdash; ${escHtml(r.role)}</span></strong>
+                                <div style="margin-bottom:6px;">${buildStarsHtml(r.rating || 5)}</div>
+                                <span style="color:var(--text-muted);font-size:0.9rem;display:block;line-height:1.55;">${escHtml(r.text)}</span>
+                            </div>
+                            <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;">
+                                <button type="button" class="btn ${r.visible ? 'btn-ghost' : 'btn-primary'}" data-id="${r.id}" data-action="toggle" style="min-width:90px;">
+                                    ${r.visible ? 'Hide' : 'Show'}
+                                </button>
+                                <button type="button" class="btn btn-danger" data-id="${r.id}" data-action="delete">Delete</button>
+                            </div>
+                        </div>
+                        <div style="color:var(--text-muted);font-size:0.8rem;">${r.visible ? '<span style="color:#4ade80;">&#10003; Visible on site</span>' : '<span style="color:var(--accent);">&#8855; Hidden</span>'}</div>
+                    `;
+
+                    reviewsDom.list.appendChild(item);
+                });
+            }
+
+            async function loadReviews() {
+                if (!state.authed) return;
+                showStatus(reviewsDom.loading, 'Loading reviews\u2026', 'loading');
+                reviewsDom.loading.style.display = 'block';
+                reviewsDom.list.innerHTML = '';
+
+                try {
+                    const { data, error } = await supabase
+                        .from('testimonials')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+                    allReviews = data || [];
+                    reviewsDom.loading.style.display = 'none';
+                    renderReviews();
+                } catch (err) {
+                    reviewsDom.loading.style.display = 'none';
+                    reviewsDom.list.innerHTML = `<div class="gallery-empty" style="color:var(--accent);">Failed to load reviews: ${escHtml(err.message)}</div>`;
+                }
+            }
+
+            async function addReview(event) {
+                event.preventDefault();
+                if (!state.authed) return;
+
+                const payload = {
+                    name:       reviewsDom.name.value.trim(),
+                    role:       reviewsDom.role.value.trim(),
+                    text:       reviewsDom.text.value.trim(),
+                    rating:     parseInt(reviewsDom.rating.value, 10),
+                    avatar_url: reviewsDom.avatar.value.trim() || null,
+                    visible:    true,
+                };
+
+                reviewsDom.addBtn.disabled = true;
+                reviewsDom.addBtn.innerHTML = '<span class="loading-dot"></span> Saving';
+                showStatus(reviewsDom.status, 'Saving review\u2026', 'loading');
+
+                try {
+                    const { error } = await supabase.from('testimonials').insert([payload]);
+                    if (error) throw error;
+
+                    showStatus(reviewsDom.status, 'Review added successfully.', 'success');
+                    reviewsDom.form.reset();
+                    await loadReviews();
+                } catch (err) {
+                    showStatus(reviewsDom.status, `Failed: ${err.message}`, 'error');
+                } finally {
+                    reviewsDom.addBtn.disabled = false;
+                    reviewsDom.addBtn.textContent = 'Add Review';
+                }
+            }
+
+            async function toggleReview(id, currentVisible) {
+                try {
+                    const { error } = await supabase
+                        .from('testimonials')
+                        .update({ visible: !currentVisible })
+                        .eq('id', id);
+                    if (error) throw error;
+                    await loadReviews();
+                } catch (err) {
+                    showStatus(reviewsDom.status, `Toggle failed: ${err.message}`, 'error');
+                }
+            }
+
+            async function deleteReview(id) {
+                const confirmed = await showConfirmModal('Delete this review from the site? This cannot be undone.');
+                if (!confirmed) return;
+
+                try {
+                    const { error } = await supabase.from('testimonials').delete().eq('id', id);
+                    if (error) throw error;
+                    showStatus(reviewsDom.status, 'Review deleted.', 'success');
+                    await loadReviews();
+                } catch (err) {
+                    showStatus(reviewsDom.status, `Delete failed: ${err.message}`, 'error');
+                }
+            }
+
+            // Reviews event delegation
+            reviewsDom.list.addEventListener('click', (event) => {
+                const btn = event.target.closest('[data-action]');
+                if (!btn) return;
+                const id = btn.dataset.id;
+                const action = btn.dataset.action;
+                const review = allReviews.find((r) => String(r.id) === String(id));
+                if (!review) return;
+
+                if (action === 'delete') deleteReview(id);
+                if (action === 'toggle') toggleReview(id, review.visible);
+            });
+
+            reviewsDom.form.addEventListener('submit', addReview);
+            reviewsDom.clearBtn.addEventListener('click', () => reviewsDom.form.reset());
+            reviewsDom.refreshBtn.addEventListener('click', loadReviews);
+
+            // Load reviews after sign-in — hook into the existing signIn flow
+            // Re-define loadImages to chain review loading after the gallery loads
+            const _origLoadImages = loadImages;
+            loadImages = async function() {
+                await _origLoadImages();
+                if (state.authed) await loadReviews();
+            };
         });
     </script>
 </body>
