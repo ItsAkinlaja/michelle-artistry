@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Page Not Found | Michelle Artistry</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" href="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-07-25_at_09.45.58-removebg-preview.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── Page layout ── */
+        .err-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ── Ambient background glows ── */
+        .err-page::before,
+        .err-page::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(80px);
+        }
+
+        .err-page::before {
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, rgba(201, 152, 24, 0.18), transparent 70%);
+            top: -120px;
+            left: -160px;
+        }
+
+        .err-page::after {
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(0, 245, 212, 0.13), transparent 70%);
+            bottom: -80px;
+            right: -120px;
+        }
+
+        /* ── Canvas particles ── */
+        #err-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Content card ── */
+        .err-card {
+            position: relative;
+            z-index: 1;
+            max-width: 560px;
+            width: 100%;
+            padding: 52px 44px;
+            border-radius: 28px;
+            background: rgba(13, 17, 34, 0.62);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 32px 90px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(201, 152, 24, 0.06);
+        }
+
+        /* ── Floating illustration ── */
+        .err-illustration {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 32px;
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .err-illustration img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 24px rgba(201, 152, 24, 0.35));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-14px); }
+        }
+
+        /* ── 404 number ── */
+        .err-code {
+            font-family: var(--font-heading);
+            font-size: clamp(5rem, 16vw, 9rem);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #ffd15c, var(--primary), #00f5d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        /* Subtle glitch flicker */
+        .err-code::after {
+            content: '404';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #00f5d4, var(--primary), #ffd15c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 94%, 100% { opacity: 0; transform: none; }
+            95%            { opacity: 0.5; transform: translate(3px, -2px) skewX(2deg); }
+            97%            { opacity: 0.3; transform: translate(-3px, 2px) skewX(-2deg); }
+        }
+
+        /* ── Kicker badge ── */
+        .err-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(247, 37, 133, 0.1);
+            border: 1px solid rgba(247, 37, 133, 0.22);
+            color: #f9a8d4;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        /* ── Heading & copy ── */
+        .err-heading {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-family: var(--font-heading);
+            margin-bottom: 14px;
+            line-height: 1.2;
+        }
+
+        .err-copy {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.7;
+            max-width: 42ch;
+            margin: 0 auto 36px;
+        }
+
+        /* ── CTA buttons ── */
+        .err-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* ── Quick links ── */
+        .err-links {
+            margin-top: 36px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .err-links-label {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 14px;
+        }
+
+        .err-links-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .err-link {
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            transition: var(--transition-fast);
+        }
+
+        .err-link:hover {
+            color: var(--text-main);
+            border-color: rgba(201, 152, 24, 0.35);
+            background: rgba(201, 152, 24, 0.08);
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 520px) {
+            .err-card {
+                padding: 36px 24px;
+                border-radius: 22px;
+            }
+
+            .err-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .err-actions .btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="err-canvas"></canvas>
+
+    <main class="err-page">
+        <div class="err-card">
+
+            <!-- Floating logo -->
+            <div class="err-illustration">
+                <img src="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-07-25_at_09.45.58-removebg-preview.png" alt="Michelle Artistry">
+            </div>
+
+            <!-- Badge -->
+            <div class="err-kicker">
+                <span>&#9679;</span> Page not found
+            </div>
+
+            <!-- Big number -->
+            <div class="err-code">404</div>
+
+            <!-- Heading -->
+            <h1 class="err-heading">
+                Looks like this page<br>
+                <span class="text-gradient-cyan">wandered off the canvas</span>
+            </h1>
+
+            <!-- Copy -->
+            <p class="err-copy">
+                The page you're looking for doesn't exist, was moved, or the link might be broken. Let's get you back to something beautiful.
+            </p>
+
+            <!-- CTAs -->
+            <div class="err-actions">
+                <a href="index.html" class="btn btn-primary">&#8592; Back to Home</a>
+                <a href="portfolio.html" class="btn btn-secondary">View Portfolio</a>
+            </div>
+
+            <!-- Quick links -->
+            <div class="err-links">
+                <div class="err-links-label">Or explore</div>
+                <div class="err-links-row">
+                    <a href="about.html"        class="err-link">About</a>
+                    <a href="testimonials.html" class="err-link">Testimonials</a>
+                    <a href="contact.html"      class="err-link">Commissions</a>
+                    <a href="chr-design.html"   class="err-link">Character Design</a>
+                    <a href="bookcover.html"    class="err-link">Book Covers</a>
+                    <a href="Manga.html"        class="err-link">Manga</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Ambient particles — same style as homepage
+        (function () {
+            const canvas = document.getElementById('err-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let W = canvas.width  = window.innerWidth;
+            let H = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', function () {
+                W = canvas.width  = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            });
+
+            var particles = [];
+            var COUNT = Math.min(55, Math.floor(W / 22));
+
+            function Particle() {
+                this.reset();
+            }
+            Particle.prototype.reset = function () {
+                this.x       = Math.random() * W;
+                this.y       = Math.random() * H;
+                this.size    = Math.random() * 2 + 0.4;
+                this.speedX  = Math.random() * 0.4 - 0.2;
+                this.speedY  = -(Math.random() * 0.5 + 0.1);
+                this.opacity = Math.random() * 0.45 + 0.15;
+                this.fade    = Math.random() * 0.004 + 0.002;
+                // Alternate gold and cyan
+                this.gold    = Math.random() > 0.5;
+            };
+            Particle.prototype.update = function () {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= this.fade;
+                if (this.opacity <= 0) {
+                    this.reset();
+                    this.y = H + 5;
+                    this.opacity = Math.random() * 0.45 + 0.15;
+                }
+            };
+            Particle.prototype.draw = function () {
+                ctx.fillStyle = this.gold
+                    ? 'rgba(201,152,24,' + this.opacity + ')'
+                    : 'rgba(0,245,212,' + this.opacity + ')';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            };
+
+            for (var i = 0; i < COUNT; i++) particles.push(new Particle());
+
+            function animate() {
+                ctx.clearRect(0, 0, W, H);
+                particles.forEach(function (p) { p.update(); p.draw(); });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
+    </script>
+</body>
+</html>

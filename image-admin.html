@@ -739,7 +739,12 @@
                                 <option value="Children book illustration">Children's Books</option>
                                 <option value="NSFW">NSFW Artwork</option>
                                 <option value="Logos">Logos & Branding</option>
+                                <option value="__new__">+ Add new category…</option>
                             </select>
+                            <input id="customCategoryInput" class="input" type="text"
+                                placeholder="Type new category name"
+                                style="display:none;margin-top:10px;"
+                                autocomplete="off">
                         </div>
 
                         <div class="upload-zone">
@@ -1217,7 +1222,9 @@
                 }
 
                 const file = dom.imageInput.files[0];
-                const category = dom.categoryInput.value;
+                const rawCategory = dom.categoryInput.value;
+                const customCat = document.getElementById('customCategoryInput').value.trim();
+                const category = rawCategory === '__new__' ? customCat : rawCategory;
                 const title = dom.titleInput.value.trim();
                 const note = dom.noteInput.value.trim();
 
@@ -1266,6 +1273,12 @@
                     showStatus(dom.uploadStatus, 'Upload complete.', 'success');
                     dom.uploadForm.reset();
                     dom.fileInfo.textContent = 'No file selected.';
+                    document.getElementById('uploadPreview').style.display = 'none';
+                    document.getElementById('uploadPreview').src = '';
+                    const customInput = document.getElementById('customCategoryInput');
+                    customInput.style.display = 'none';
+                    customInput.required = false;
+                    customInput.value = '';
                     await loadImages();
                 } catch (error) {
                     showStatus(dom.uploadStatus, `Upload failed: ${error.message}`, 'error');
@@ -1368,6 +1381,10 @@
                 const preview = document.getElementById('uploadPreview');
                 preview.style.display = 'none';
                 preview.src = '';
+                const customInput = document.getElementById('customCategoryInput');
+                customInput.style.display = 'none';
+                customInput.required = false;
+                customInput.value = '';
                 showStatus(dom.uploadStatus, 'Form cleared.', 'success');
             });
 
@@ -1377,6 +1394,16 @@
             });
 
             dom.categoryInput.addEventListener('change', () => {
+                const customInput = document.getElementById('customCategoryInput');
+                if (dom.categoryInput.value === '__new__') {
+                    customInput.style.display = 'block';
+                    customInput.required = true;
+                    customInput.focus();
+                } else {
+                    customInput.style.display = 'none';
+                    customInput.required = false;
+                    customInput.value = '';
+                }
                 syncStats();
             });
 
