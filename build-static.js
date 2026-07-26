@@ -42,6 +42,9 @@ async function main() {
   if (adminEmail && adminPassword) {
     const creds = { email: String(adminEmail), password: String(adminPassword) };
     await fs.promises.writeFile(path.join(outputDir, 'admin-creds.json'), JSON.stringify(creds, null, 2), { mode: 0o600 });
+    console.log('admin-creds.json written from environment variables.');
+  } else {
+    console.warn('WARNING: ADMIN_EMAIL or ADMIN_PASSWORD env vars not set. admin-creds.json will NOT be available in the deployed build. Admin login will fail.');
   }
 
   console.log(`Static build complete: ${outputDir}`);

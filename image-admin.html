@@ -1121,7 +1121,7 @@
             async function loadCredentials() {
                 const response = await fetch('/admin-creds.json', { cache: 'no-store' });
                 if (!response.ok) {
-                    throw new Error('admin-creds.json is missing or not reachable');
+                    throw new Error('Admin credentials file not found. On the live site, make sure ADMIN_EMAIL and ADMIN_PASSWORD are set as Vercel environment variables and the site has been redeployed after adding them.');
                 }
                 return response.json();
             }
