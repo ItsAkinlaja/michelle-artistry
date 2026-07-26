@@ -346,79 +346,114 @@
             margin-bottom: 18px;
         }
 
+        /* ── Upload preview ── */
+        .upload-preview {
+            display: none;
+            width: 100%;
+            max-height: 220px;
+            object-fit: contain;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            margin-top: 10px;
+        }
+
+        /* ── Gallery grid ── */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px;
         }
 
         .gallery-item {
             position: relative;
-            border-radius: 18px;
+            border-radius: 16px;
             overflow: hidden;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            aspect-ratio: 1 / 1.15;
             display: flex;
             flex-direction: column;
         }
 
+        /* Image takes natural aspect ratio — no forced crop */
         .gallery-media {
             position: relative;
-            flex: 1;
+            width: 100%;
             background: rgba(255, 255, 255, 0.04);
         }
 
         .gallery-media img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
             display: block;
+            object-fit: contain;
         }
 
+        /* Overlay shown on hover (desktop) — always visible on touch */
         .gallery-overlay {
             position: absolute;
             inset: 0;
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
-            padding: 14px;
-            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.78) 100%);
+            padding: 10px;
+            background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.82) 100%);
             opacity: 0;
-            transition: opacity 0.25s ease;
-            gap: 12px;
+            transition: opacity 0.22s ease;
+            gap: 8px;
         }
 
         .gallery-item:hover .gallery-overlay {
             opacity: 1;
         }
 
-        .gallery-meta {
-            min-width: 0;
+        /* On touch devices always show overlay */
+        @media (hover: none) {
+            .gallery-overlay { opacity: 1; }
         }
+
+        .gallery-meta { min-width: 0; flex: 1; }
 
         .gallery-title {
             font-family: var(--font-heading);
-            font-size: 0.95rem;
-            margin-bottom: 4px;
+            font-size: 0.88rem;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .gallery-subtitle {
             color: var(--text-muted);
-            font-size: 0.82rem;
+            font-size: 0.78rem;
         }
 
+        /* Footer below image — title + delete only, no duplicate overlay button */
         .gallery-footer {
-            padding: 14px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 8px;
+            border-top: 1px solid rgba(255,255,255,0.06);
         }
+
+        .gallery-footer .gallery-title { font-size: 0.82rem; }
 
         .gallery-category {
             color: var(--text-muted);
-            font-size: 0.84rem;
+            font-size: 0.78rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Delete button compact in footer */
+        .gallery-footer .btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            min-width: 0;
+            flex-shrink: 0;
         }
 
         .gallery-empty {
@@ -546,22 +581,31 @@
             }
 
             .gallery-footer {
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: row;
+                align-items: center;
             }
 
-            .gallery-footer .btn {
-                width: 100%;
-                min-width: 0;
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 10px;
             }
 
-            .gallery-meta {
-                width: 100%;
+            /* Reviews form: stack to single column on mobile */
+            #reviewForm .two-col {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
             }
 
-            .gallery-category {
-                margin-top: 4px;
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
             }
+
+            .hero-card { display: none; } /* hide big hero on very small screens */
         }
     </style>
 </head>
@@ -589,8 +633,6 @@
         #navbar { position: sticky; top: 0; z-index: 1200; backdrop-filter: blur(6px); }
         @media (max-width: 860px) {
             .admin-shell { padding-top: 84px; }
-            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-            .gallery-item { aspect-ratio: 1 / 1.05; }
         }
     </style>
 
@@ -704,6 +746,7 @@
                             <div class="upload-zone-title">Image File</div>
                             <div class="upload-zone-copy">Choose a JPG, PNG, or WEBP file. The image is uploaded to storage and indexed in the CMS.</div>
                             <input id="imageInput" class="input" type="file" accept="image/*" required>
+                            <img id="uploadPreview" class="upload-preview" alt="Preview">
                             <div id="fileInfo" class="file-name">No file selected.</div>
                         </div>
 
@@ -744,40 +787,7 @@
                 </section>
             </div>
 
-            <section class="panel-card">
-                <div class="panel-header">
-                    <div>
-                        <h3>Quick CMS Notes</h3>
-                        <p class="panel-copy">A short operational checklist for daily image management.</p>
-                    </div>
-                </div>
-
-                <div class="quick-list">
-                    <div class="quick-item">
-                        <div>
-                            <strong>Upload first, then publish</strong>
-                            <span>Every upload writes to storage and the artworks table together.</span>
-                        </div>
-                        <div class="hero-pill">Storage + DB</div>
-                    </div>
-                    <div class="quick-item">
-                        <div>
-                            <strong>Delete removes files too</strong>
-                            <span>Deleting an item clears the storage object to avoid wasted space.</span>
-                        </div>
-                        <div class="hero-pill">Cleanup</div>
-                    </div>
-                    <div class="quick-item">
-                        <div>
-                            <strong>Local admin access only</strong>
-                            <span>Sign in uses the credentials stored in admin-creds.json.</span>
-                        </div>
-                        <div class="hero-pill">Private</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ===== REVIEWS MANAGER ===== -->
+<!-- ===== REVIEWS MANAGER ===== -->
             <section class="panel-card" id="reviewsPanel">
                 <div class="panel-header">
                     <div>
@@ -793,7 +803,7 @@
 
                 <!-- Add review form -->
                 <form id="reviewForm" class="upload-form" style="margin-bottom:28px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                         <div>
                             <label for="reviewName">Client Name</label>
                             <input id="reviewName" class="input" type="text" placeholder="e.g. Sarah Jenkins" required>
@@ -807,7 +817,7 @@
                         <label for="reviewText">Review Text</label>
                         <textarea id="reviewText" class="textarea" placeholder="What did the client say?" required></textarea>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                         <div>
                             <label for="reviewRating">Star Rating (1–5)</label>
                             <select id="reviewRating" class="select">
@@ -988,16 +998,31 @@
                 });
             }
 
-            function renderGallery() {
+            function getPageSize() {
+                return window.innerWidth <= 768 ? 4 : 6;
+            }
+
+            let galleryPage = 1;
+
+            function renderGallery(resetPage) {
+                if (resetPage !== false) galleryPage = 1;
+
                 const images = getFilteredImages();
+                const pageSize = getPageSize();
+                const visible = galleryPage * pageSize;
+                const slice = images.slice(0, visible);
+
                 dom.galleryGrid.innerHTML = '';
 
-                if (!images.length) {
+                const existingBtn = document.getElementById('loadMoreBtn');
+                if (existingBtn) existingBtn.remove();
+
+                if (!slice.length) {
                     dom.galleryGrid.innerHTML = '<div class="gallery-empty">No artworks match this view.</div>';
                     return;
                 }
 
-                images.forEach((image) => {
+                slice.forEach((image) => {
                     const item = document.createElement('article');
                     item.className = 'gallery-item';
 
@@ -1042,23 +1067,7 @@
                     subtitle.textContent = formatDate(image.created_at);
 
                     overlayMeta.append(title, subtitle);
-
-                    const overlayDelete = document.createElement('button');
-                    overlayDelete.type = 'button';
-                    overlayDelete.className = 'btn btn-danger';
-                    overlayDelete.textContent = image.source === 'local' ? 'Local' : 'Delete';
-                    if (image.source === 'local') {
-                        overlayDelete.disabled = true;
-                        overlayDelete.title = 'Local file - manage via filesystem';
-                        overlayDelete.classList.add('btn-ghost');
-                    } else {
-                        overlayDelete.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            deleteImage(image.id, image.image_path);
-                        });
-                    }
-
-                    overlay.append(overlayMeta, overlayDelete);
+                    overlay.append(overlayMeta);
                     media.append(img, overlay);
 
                     const footer = document.createElement('div');
@@ -1085,6 +1094,23 @@
                     item.append(media, footer);
                     dom.galleryGrid.appendChild(item);
                 });
+
+                // Load More button
+                if (visible < images.length) {
+                    const remaining = images.length - visible;
+                    const nextBatch = Math.min(remaining, pageSize);
+                    const loadMore = document.createElement('button');
+                    loadMore.id = 'loadMoreBtn';
+                    loadMore.type = 'button';
+                    loadMore.className = 'btn btn-ghost';
+                    loadMore.textContent = `Load ${nextBatch} more  (${remaining} remaining)`;
+                    loadMore.style.cssText = 'grid-column:1/-1;margin:12px auto 0;min-width:200px;';
+                    loadMore.addEventListener('click', () => {
+                        galleryPage++;
+                        renderGallery(false);
+                    });
+                    dom.galleryGrid.appendChild(loadMore);
+                }
             }
 
             async function loadCredentials() {
@@ -1319,7 +1345,7 @@
                 document.querySelectorAll('.chip').forEach((chip) => {
                     chip.classList.toggle('active', chip.dataset.filter === filter);
                 });
-                renderGallery();
+                renderGallery(); // resets page
             }
 
             dom.loginForm.addEventListener('submit', async (event) => {
@@ -1339,12 +1365,15 @@
             dom.clearBtn.addEventListener('click', () => {
                 dom.uploadForm.reset();
                 dom.fileInfo.textContent = 'No file selected.';
+                const preview = document.getElementById('uploadPreview');
+                preview.style.display = 'none';
+                preview.src = '';
                 showStatus(dom.uploadStatus, 'Form cleared.', 'success');
             });
 
             dom.searchInput.addEventListener('input', (event) => {
                 state.search = event.target.value;
-                renderGallery();
+                renderGallery(); // resets page on new search
             });
 
             dom.categoryInput.addEventListener('change', () => {
@@ -1354,6 +1383,16 @@
             dom.imageInput.addEventListener('change', () => {
                 const file = dom.imageInput.files[0];
                 dom.fileInfo.textContent = file ? `${file.name} • ${(file.size / 1024 / 1024).toFixed(2)} MB` : 'No file selected.';
+                const preview = document.getElementById('uploadPreview');
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    preview.src = url;
+                    preview.style.display = 'block';
+                    preview.onload = () => URL.revokeObjectURL(url);
+                } else {
+                    preview.style.display = 'none';
+                    preview.src = '';
+                }
             });
 
             document.getElementById('filterBar').addEventListener('click', (event) => {
