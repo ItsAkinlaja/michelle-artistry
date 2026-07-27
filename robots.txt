@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Block admin and internal pages from indexing
+Disallow: /admin-creds.json
+Disallow: /image-admin.html
+Disallow: /NSFW.html
+Disallow: /lajah.html
+Disallow: /gallery.html
+Disallow: /public_images.json
+Disallow: /.env
+
+# Block Vercel build artifacts
+Disallow: /dist/
+Disallow: /node_modules/
+
+Sitemap: https://michelle-artistry.vercel.app/sitemap.xml

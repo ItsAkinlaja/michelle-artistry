@@ -4,18 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Character Design Gallery | Michelle Artistry</title>
-    <meta name="description" content="Explore character design sheets, orthographic views, and concept art by Michelle Artistry.">
+    <meta name="description" content="Browse 30+ character design sheets, orthographic views, fantasy & sci-fi concept art by Michelle Artistry. Perfect for games, D&D, 3D modeling pipelines & storytelling projects.">
     <link rel="canonical" href="https://michelle-artistry.vercel.app/chr-design.html">
     <meta name="robots" content="index,follow">
     <meta property="og:title" content="Character Design — Michelle Artistry">
     <meta property="og:description" content="Explore character design sheets, orthographic views, and concept art by Michelle Artistry.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://michelle-artistry.vercel.app/chr-design.html">
+    <meta property="og:site_name" content="Michelle Artistry">
+    <meta property="og:locale" content="en_US">
     <meta property="og:image" content="https://ik.imagekit.io/scmchurch/WhatsApp%20Image%202026-07-25%20at%2009.45.58.jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Character Design Gallery — Michelle Artistry">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Character Design — Michelle Artistry">
-    <meta name="twitter:description" content="Explore character design sheets, orthographic views, and concept art by Michelle Artistry.">
+    <meta name="twitter:description" content="Browse 30+ character design sheets, fantasy & sci-fi concept art for games, D&D and 3D pipelines.">
     <meta name="twitter:image" content="https://ik.imagekit.io/scmchurch/WhatsApp%20Image%202026-07-25%20at%2009.45.58.jpeg">
+    <meta name="twitter:creator" content="@michwalls_art">
     <link rel="icon" href="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-07-25_at_09.45.58-removebg-preview.png" type="image/png">
     <link rel="apple-touch-icon" href="https://ik.imagekit.io/scmchurch/WhatsApp_Image_2026-07-25_at_09.45.58-removebg-preview.png">
     <link rel="stylesheet" href="style.css">
@@ -119,8 +125,8 @@
                 <p>&copy; 2026 Michelle Artistry. All rights reserved. Designed for Visual Excellence.</p>
                 <p class="footer-credit">Website designed and developed by <a href="https://akinlaja.netlify.app" target="_blank" rel="noopener">Akinlaja</a></p>
                 <div class="footer-legal-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="terms.html">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -131,5 +137,28 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="app.js"></script>
+    <!-- JSON-LD: Gallery page + Breadcrumb -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          "url": "https://michelle-artistry.vercel.app/chr-design.html",
+          "name": "Character Design Gallery — Michelle Artistry",
+          "description": "Detailed character design sheets, orthographic concept art, expressions, and equipment design by Michelle Artistry for games, D&D, and storytelling.",
+          "author": { "@type": "Person", "name": "Michelle Artistry", "url": "https://michelle-artistry.vercel.app/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://michelle-artistry.vercel.app/" },
+            { "@type": "ListItem", "position": 2, "name": "Portfolio", "item": "https://michelle-artistry.vercel.app/portfolio.html" },
+            { "@type": "ListItem", "position": 3, "name": "Character Design", "item": "https://michelle-artistry.vercel.app/chr-design.html" }
+          ]
+        }
+      ]
+    }
+    </script>
 </body>
 </html>

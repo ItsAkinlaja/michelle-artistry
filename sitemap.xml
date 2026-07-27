@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://ik.imagekit.io/scmchurch/WhatsApp%20Image%202026-07-25%20at%2009.45.58.jpeg</image:loc>
+      <image:title>Michelle Artistry — Digital Illustration &amp; Character Design</image:title>
+    </image:image>
+  </url>
+
+  <!-- About -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/about.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Portfolio Hub -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/portfolio.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Contact / Commissions -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/contact.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Testimonials -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/testimonials.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Character Design Gallery -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/chr-design.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://ik.imagekit.io/scmchurch/artworks/Character%20design/Guillermo%20portulaca.png</image:loc>
+      <image:title>Character Design — Michelle Artistry</image:title>
+    </image:image>
+  </url>
+
+  <!-- Book Cover Gallery -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/bookcover.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://ik.imagekit.io/scmchurch/artworks/book%20cover/The%20Midnight%20Coffee%20House.png</image:loc>
+      <image:title>Book Cover Illustration — Michelle Artistry</image:title>
+    </image:image>
+  </url>
+
+  <!-- Comics & Storyboards Gallery -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/str-brd.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Manga Art Gallery -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/Manga.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Fan Art Gallery -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/fan-art.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Portrait Illustration Gallery -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/portrait.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Logos & Branding Gallery -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/logo.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Children's Book Illustration Gallery -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/chdbk.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/privacy-policy.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Terms of Service -->
+  <url>
+    <loc>https://michelle-artistry.vercel.app/terms.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>
