@@ -456,6 +456,23 @@
             flex-shrink: 0;
         }
 
+        @media (max-width: 768px) {
+            .gallery-footer {
+                gap: 6px;
+            }
+            .gallery-footer .btn {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+            .gallery-footer .gallery-title {
+                font-size: 0.76rem;
+            }
+            .gallery-footer .gallery-category {
+                font-size: 0.7rem;
+            }
+        }
+
         .gallery-empty {
             grid-column: 1 / -1;
             padding: 40px 20px;
@@ -635,6 +652,15 @@
             .admin-shell { padding-top: 84px; }
         }
     </style>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu">
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="image-admin.html">Admin Dashboard</a></li>
+        </ul>
+    </div>
 
     <main class="admin-shell">
         <section class="admin-hero">
@@ -871,6 +897,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const config = window.CONFIG || {
