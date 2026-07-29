@@ -1041,7 +1041,13 @@
                             Permanently deletes <strong style="color:#f87171;">every artwork</strong> from Supabase storage and the database. Use this only when you want a full clean slate before re-uploading your portfolio. This action cannot be undone.
                         </p>
                         <div id="dangerStatus" class="status"></div>
-                        <button id="wipeAllBtn" type="button" class="btn btn-danger">⚠ Wipe All Artworks</button>
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                            <button id="wipeAllBtn" type="button" class="btn btn-danger">⚠ Wipe All Artworks</button>
+                            <button id="clearStaleBtn" type="button" class="btn btn-ghost" title="Delete database rows whose image_path has no matching file in Supabase storage">🧹 Clear Stale Records</button>
+                        </div>
+                        <p style="margin-top:10px;font-size:0.82rem;color:var(--text-muted);">
+                            <em>Clear Stale Records</em> removes database entries that point to files no longer in storage (e.g. leftovers from a previous wipe).
+                        </p>
                     </div>
                 </details>
             </section>
@@ -1119,6 +1125,7 @@
                 clearBtn: document.getElementById('clearBtn'),
                 refreshBtn: document.getElementById('refreshBtn'),
                 wipeAllBtn: document.getElementById('wipeAllBtn'),
+                clearStaleBtn: document.getElementById('clearStaleBtn'),
                 dangerStatus: document.getElementById('dangerStatus'),
                 uploadStatus: document.getElementById('uploadStatus'),
                 galleryStatus: document.getElementById('galleryStatus'),
@@ -1488,13 +1495,14 @@
                 setUploadProgress(0);
 
                 try {
-                    // Use XHR for real upload progress
+                    // Use XHR for real upload progress tracking.
+                    // Supabase Storage REST API expects each path segment encoded separately,
+                    // NOT the full path encoded as one string (which would encode '/' to '%2F').
                     await new Promise((resolve, reject) => {
-                        const formData = new FormData();
-                        formData.append('', file);
-
                         const xhr = new XMLHttpRequest();
-                        const supaStorageUrl = `${config.SUPABASE_URL}/storage/v1/object/artworks/${encodeURIComponent(storagePath)}`;
+                        // Encode each path segment individually so slashes are preserved in the URL
+                        const encodedPath = storagePath.split('/').map(encodeURIComponent).join('/');
+                        const supaStorageUrl = `${config.SUPABASE_URL}/storage/v1/object/artworks/${encodedPath}`;
 
                         xhr.open('POST', supaStorageUrl);
                         xhr.setRequestHeader('Authorization', `Bearer ${config.SUPABASE_ANON_KEY}`);
@@ -1503,7 +1511,7 @@
 
                         xhr.upload.addEventListener('progress', (e) => {
                             if (e.lengthComputable) {
-                                // Upload is 80% of the total perceived progress
+                                // Upload phase = 0–80% of perceived progress
                                 setUploadProgress(Math.round((e.loaded / e.total) * 80));
                             }
                         });
@@ -1824,6 +1832,62 @@
                 }
             }
 
+            // ── Clear stale database records (rows with no matching storage file) ──
+            async function clearStaleRecords() {
+                if (!state.authed) return;
+
+                dom.clearStaleBtn.disabled = true;
+                dom.clearStaleBtn.textContent = '🧹 Checking…';
+                showStatus(dom.dangerStatus, 'Scanning for stale records…', 'loading');
+
+                try {
+                    // Fetch all DB rows
+                    const { data: allRows, error: fetchErr } = await supabase
+                        .from('artworks')
+                        .select('id, image_path');
+                    if (fetchErr) throw fetchErr;
+
+                    if (!allRows || allRows.length === 0) {
+                        showStatus(dom.dangerStatus, 'Database is already empty — nothing to clean.', 'success');
+                        return;
+                    }
+
+                    // Check each file exists in storage by attempting a HEAD request
+                    const staleIds = [];
+                    await Promise.all(allRows.map(async (row) => {
+                        try {
+                            const { data } = await supabase.storage
+                                .from('artworks')
+                                .createSignedUrl(row.image_path, 5); // 5-second signed URL just to test existence
+                            if (!data || !data.signedUrl) staleIds.push(row.id);
+                        } catch {
+                            staleIds.push(row.id);
+                        }
+                    }));
+
+                    if (staleIds.length === 0) {
+                        showStatus(dom.dangerStatus, '✓ All records are valid — no stale entries found.', 'success');
+                        return;
+                    }
+
+                    // Delete stale rows
+                    const { error: delErr } = await supabase
+                        .from('artworks')
+                        .delete()
+                        .in('id', staleIds);
+                    if (delErr) throw delErr;
+
+                    showStatus(dom.dangerStatus, `✓ Removed ${staleIds.length} stale record${staleIds.length !== 1 ? 's' : ''}.`, 'success');
+                    await loadImages();
+                    await loadSpotlight();
+                } catch (err) {
+                    showStatus(dom.dangerStatus, `Clear stale failed: ${err.message}`, 'error');
+                } finally {
+                    dom.clearStaleBtn.disabled = false;
+                    dom.clearStaleBtn.textContent = '🧹 Clear Stale Records';
+                }
+            }
+
             function showConfirmModal(message) {
                 return new Promise((resolve) => {
                     dom.confirmMessage.textContent = message;
@@ -1884,6 +1948,7 @@
             dom.refreshBtn.addEventListener('click', async () => { await loadImages(); await loadSpotlight(); });
             if (dom.refreshSpotlightBtn) dom.refreshSpotlightBtn.addEventListener('click', loadSpotlight);
             if (dom.wipeAllBtn) dom.wipeAllBtn.addEventListener('click', wipeAllArtworks);
+            if (dom.clearStaleBtn) dom.clearStaleBtn.addEventListener('click', clearStaleRecords);
 
             dom.clearBtn.addEventListener('click', () => {
                 dom.uploadForm.reset();
