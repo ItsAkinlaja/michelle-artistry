@@ -955,20 +955,73 @@
                 </section>
             </div>
 
-<!-- ===== HOMEPAGE SPOTLIGHT MANAGER ===== -->
+<!-- ===== HOMEPAGE SPOTLIGHT UPLOAD ===== -->
             <section class="panel-card" id="spotlightPanel">
                 <div class="panel-header">
                     <div>
-                        <h3>Homepage Spotlight</h3>
-                        <p class="panel-copy">Choose up to 3 artworks to feature on the homepage showcase. Use the gallery below to toggle which images appear, then reorder them here.</p>
+                        <h3>Homepage Spotlight <span style="font-size:0.82rem;color:var(--secondary);font-weight:400;font-family:var(--font-body);">— up to 3 images</span></h3>
+                        <p class="panel-copy">Upload images specifically for the homepage showcase cards. These are separate from the portfolio galleries. Upload up to 3 — they appear in order.</p>
                     </div>
                     <div class="panel-actions">
                         <button id="refreshSpotlightBtn" type="button" class="btn btn-ghost">Refresh</button>
                     </div>
                 </div>
                 <div id="spotlightStatus" class="status"></div>
-                <div id="spotlightOrderList" class="spotlight-order-list">
-                    <div class="spotlight-empty">Loading featured artworks…</div>
+
+                <!-- Current spotlight images -->
+                <div id="spotlightOrderList" class="spotlight-order-list" style="margin-bottom:24px;">
+                    <div class="spotlight-empty">Loading…</div>
+                </div>
+
+                <!-- Upload form for spotlight -->
+                <div id="spotlightUploadWrap">
+                    <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;margin-top:4px;">
+                        <div style="font-family:var(--font-heading);font-size:0.88rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:16px;">Add a spotlight image</div>
+                        <form id="spotlightUploadForm" class="upload-form">
+                            <div>
+                                <label for="spotlightTitle">Card Title</label>
+                                <input id="spotlightTitle" class="input" type="text" placeholder="e.g. Character Design" required>
+                            </div>
+                            <div>
+                                <label for="spotlightDesc">Card Description <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+                                <input id="spotlightDesc" class="input" type="text" placeholder="e.g. High-fidelity concept sheets for games and publishing">
+                            </div>
+                            <div>
+                                <label for="spotlightCategory">Links to gallery</label>
+                                <select id="spotlightCategory" class="select" required>
+                                    <option value="" disabled selected>Select a gallery page</option>
+                                    <option value="Comics & Storyboards">Comics & Storyboards</option>
+                                    <option value="Character Design">Character Design</option>
+                                    <option value="Portrait Illustration">Portrait Illustration</option>
+                                    <option value="Book Covers">Book Covers</option>
+                                    <option value="Manga Art">Manga Art</option>
+                                    <option value="Fan Art">Fan Art</option>
+                                    <option value="Children's Books">Children's Books</option>
+                                    <option value="Logos & Branding">Logos & Branding</option>
+                                </select>
+                            </div>
+                            <div class="upload-zone">
+                                <div class="upload-zone-title">Image File</div>
+                                <div class="upload-zone-copy">JPG, PNG or WEBP. This image will appear as the spotlight card background.</div>
+                                <input id="spotlightImageInput" class="input" type="file" accept="image/*" required>
+                                <img id="spotlightPreview" class="upload-preview" alt="Preview">
+                                <div id="spotlightFileInfo" class="file-name">No file selected.</div>
+                                <div id="spotlightProgressWrap" class="upload-progress-wrap">
+                                    <div class="upload-progress-label">
+                                        <span>Uploading…</span>
+                                        <span id="spotlightProgressPct" class="upload-progress-pct">0%</span>
+                                    </div>
+                                    <div class="upload-progress-bar-outer">
+                                        <div id="spotlightProgressBar" class="upload-progress-bar-inner"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="actions-row">
+                                <button id="spotlightUploadBtn" type="submit" class="btn btn-primary" disabled>Add to Spotlight</button>
+                                <button id="spotlightClearBtn" type="button" class="btn btn-ghost" disabled>Clear</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </section>
 
@@ -976,6 +1029,7 @@
             <section class="panel-card" id="reviewsPanel">
                 <div class="panel-header">
                     <div>
+
                         <h3>Reviews Manager</h3>
                         <p class="panel-copy">Add, toggle visibility, or delete client testimonials shown on the public Testimonials page.</p>
                     </div>
@@ -1156,6 +1210,19 @@
                 spotlightStatus: document.getElementById('spotlightStatus'),
                 spotlightOrderList: document.getElementById('spotlightOrderList'),
                 refreshSpotlightBtn: document.getElementById('refreshSpotlightBtn'),
+                // Spotlight upload form
+                spotlightUploadForm: document.getElementById('spotlightUploadForm'),
+                spotlightUploadBtn: document.getElementById('spotlightUploadBtn'),
+                spotlightClearBtn: document.getElementById('spotlightClearBtn'),
+                spotlightTitle: document.getElementById('spotlightTitle'),
+                spotlightDesc: document.getElementById('spotlightDesc'),
+                spotlightCategory: document.getElementById('spotlightCategory'),
+                spotlightImageInput: document.getElementById('spotlightImageInput'),
+                spotlightFileInfo: document.getElementById('spotlightFileInfo'),
+                spotlightPreview: document.getElementById('spotlightPreview'),
+                spotlightProgressWrap: document.getElementById('spotlightProgressWrap'),
+                spotlightProgressBar: document.getElementById('spotlightProgressBar'),
+                spotlightProgressPct: document.getElementById('spotlightProgressPct'),
             };
 
             function showStatus(element, message, kind = 'loading') {
@@ -1312,21 +1379,9 @@
                     footerDelete.textContent = image.source === 'local' ? 'Local' : 'Delete';
                     if (image.source !== 'local') footerDelete.addEventListener('click', () => deleteImage(image.id, image.image_path));
 
-                    // Homepage feature toggle button (only for DB images)
+                    // Footer actions — just the delete button now
                     const footerActions = document.createElement('div');
                     footerActions.style.cssText = 'display:flex;gap:6px;flex-shrink:0;';
-
-                    if (image.source !== 'local') {
-                        const featBtn = document.createElement('button');
-                        featBtn.type = 'button';
-                        const isFeatured = !!image.show_on_homepage;
-                        featBtn.className = 'gallery-feature-btn' + (isFeatured ? ' featured' : '');
-                        featBtn.title = isFeatured ? 'Remove from homepage spotlight' : 'Add to homepage spotlight';
-                        featBtn.textContent = isFeatured ? '★ Featured' : '☆ Feature';
-                        featBtn.addEventListener('click', () => toggleHomepageFeature(image, featBtn));
-                        footerActions.appendChild(featBtn);
-                    }
-
                     footerActions.appendChild(footerDelete);
                     footer.append(footerMeta, footerActions);
                     item.append(media, footer);
@@ -1396,7 +1451,7 @@
                 try {
                     const { data, error } = await supabase
                         .from('artworks')
-                        .select('id,title,category,image_path,created_at,show_on_homepage,homepage_order')
+                        .select('id,title,category,image_path,created_at')
                         .order('created_at', { ascending: false });
 
                     if (error) throw error;
@@ -1611,86 +1666,48 @@
             }
 
             // ── Toggle homepage feature ──────────────────────────────
-            async function toggleHomepageFeature(image, btn) {
-                if (!state.authed) return;
+            // (No longer used — homepage images are uploaded directly via the spotlight form)
 
-                const willFeature = !image.show_on_homepage;
-
-                // Max 3 featured artworks
-                if (willFeature) {
-                    const currentlyFeatured = state.allImages.filter(i => i.show_on_homepage && i.source !== 'local');
-                    if (currentlyFeatured.length >= 3) {
-                        await showMessageModal('You can only feature up to 3 artworks on the homepage. Remove one first.');
-                        return;
-                    }
-                }
-
-                btn.disabled = true;
-                btn.textContent = '…';
-
-                try {
-                    const newOrder = willFeature
-                        ? state.allImages.filter(i => i.show_on_homepage).length + 1
-                        : null;
-
-                    const { error } = await supabase
-                        .from('artworks')
-                        .update({ show_on_homepage: willFeature, homepage_order: newOrder })
-                        .eq('id', image.id);
-
-                    if (error) throw error;
-
-                    // Update local state
-                    image.show_on_homepage = willFeature;
-                    image.homepage_order = newOrder;
-
-                    btn.className = 'gallery-feature-btn' + (willFeature ? ' featured' : '');
-                    btn.title = willFeature ? 'Remove from homepage spotlight' : 'Add to homepage spotlight';
-                    btn.textContent = willFeature ? '★ Featured' : '☆ Feature';
-
-                    showStatus(dom.uploadStatus,
-                        willFeature ? '✓ Added to homepage spotlight.' : '✓ Removed from homepage spotlight.',
-                        'success');
-
-                    await loadSpotlight();
-                } catch (err) {
-                    showStatus(dom.uploadStatus, `Feature toggle failed: ${err.message}`, 'error');
-                } finally {
-                    btn.disabled = false;
-                }
-            }
-
-            // ── Spotlight manager ────────────────────────────────────
+            // ── Spotlight: load & render current homepage images ─────
             async function loadSpotlight() {
                 if (!state.authed || !dom.spotlightOrderList) return;
 
+                // Show/hide upload form based on count
+                const updateUploadVisibility = (count) => {
+                    const wrap = document.getElementById('spotlightUploadWrap');
+                    if (wrap) wrap.style.display = count >= 3 ? 'none' : 'block';
+                    if (dom.spotlightUploadBtn) dom.spotlightUploadBtn.disabled = count >= 3;
+                };
+
                 try {
                     const { data, error } = await supabase
-                        .from('artworks')
-                        .select('id,title,category,image_path,show_on_homepage,homepage_order')
-                        .eq('show_on_homepage', true)
-                        .order('homepage_order', { ascending: true });
+                        .from('homepage_spotlight')
+                        .select('*')
+                        .order('display_order', { ascending: true });
 
                     if (error) throw error;
 
                     dom.spotlightOrderList.innerHTML = '';
 
                     if (!data || data.length === 0) {
-                        dom.spotlightOrderList.innerHTML = '<div class="spotlight-empty">No artworks featured yet. Click ☆ Feature on any image in the gallery to add it here.</div>';
+                        dom.spotlightOrderList.innerHTML = '<div class="spotlight-empty">No spotlight images yet. Upload up to 3 below.</div>';
+                        updateUploadVisibility(0);
                         return;
                     }
 
+                    updateUploadVisibility(data.length);
+
                     data.forEach((item, idx) => {
-                        const ikUrl = imagekitEndpoint.replace(/\/$/, '') + '/artworks/' + encodeURI(item.image_path) + '?tr=w-200,h-200,c-maintain_ratio,q-75';
-                        const supaUrl = `${config.SUPABASE_URL}/storage/v1/object/public/artworks/${encodeURI(item.image_path)}`;
+                        const encodedPath = item.image_path.split('/').map(encodeURIComponent).join('/');
+                        const ikUrl = imagekitEndpoint.replace(/\/$/, '') + '/spotlight/' + encodedPath + '?tr=w-200,h-200,c-maintain_ratio,q-75';
+                        const supaUrl = `${config.SUPABASE_URL}/storage/v1/object/public/spotlight/${encodeURI(item.image_path)}`;
 
                         const row = document.createElement('div');
                         row.className = 'spotlight-order-item';
-                        row.dataset.id = item.id;
 
                         const thumb = document.createElement('img');
                         thumb.className = 'spotlight-order-thumb';
-                        thumb.alt = item.title || 'Artwork';
+                        thumb.alt = item.title || 'Spotlight';
                         thumb.src = ikUrl;
                         thumb.onerror = () => { thumb.src = supaUrl; };
 
@@ -1701,77 +1718,153 @@
                         const actions = document.createElement('div');
                         actions.className = 'spotlight-order-actions';
 
+                        // Move up
                         if (idx > 0) {
                             const upBtn = document.createElement('button');
-                            upBtn.type = 'button';
-                            upBtn.className = 'spotlight-order-btn';
-                            upBtn.title = 'Move up';
-                            upBtn.textContent = '↑';
-                            upBtn.addEventListener('click', () => moveSpotlight(item.id, data, idx, -1));
+                            upBtn.type = 'button'; upBtn.className = 'spotlight-order-btn'; upBtn.textContent = '↑';
+                            upBtn.addEventListener('click', () => moveSpotlight(item, data, idx, -1));
                             actions.appendChild(upBtn);
                         }
-
+                        // Move down
                         if (idx < data.length - 1) {
                             const downBtn = document.createElement('button');
-                            downBtn.type = 'button';
-                            downBtn.className = 'spotlight-order-btn';
-                            downBtn.title = 'Move down';
-                            downBtn.textContent = '↓';
-                            downBtn.addEventListener('click', () => moveSpotlight(item.id, data, idx, 1));
+                            downBtn.type = 'button'; downBtn.className = 'spotlight-order-btn'; downBtn.textContent = '↓';
+                            downBtn.addEventListener('click', () => moveSpotlight(item, data, idx, 1));
                             actions.appendChild(downBtn);
                         }
-
-                        const removeBtn = document.createElement('button');
-                        removeBtn.type = 'button';
-                        removeBtn.className = 'spotlight-order-btn';
-                        removeBtn.title = 'Remove from homepage';
-                        removeBtn.textContent = '✕';
-                        removeBtn.style.color = '#f87171';
-                        removeBtn.addEventListener('click', async () => {
-                            removeBtn.disabled = true;
-                            removeBtn.textContent = '…';
+                        // Delete
+                        const delBtn = document.createElement('button');
+                        delBtn.type = 'button'; delBtn.className = 'spotlight-order-btn'; delBtn.textContent = '✕';
+                        delBtn.style.color = '#f87171';
+                        delBtn.addEventListener('click', async () => {
+                            delBtn.disabled = true; delBtn.textContent = '…';
                             try {
-                                await supabase.from('artworks').update({ show_on_homepage: false, homepage_order: null }).eq('id', item.id);
-                                // Update allImages state too
-                                const found = state.allImages.find(i => i.id === item.id);
-                                if (found) { found.show_on_homepage = false; found.homepage_order = null; }
-                                showStatus(dom.spotlightStatus, '✓ Removed from homepage spotlight.', 'success');
+                                await supabase.storage.from('spotlight').remove([item.image_path]);
+                                await supabase.from('homepage_spotlight').delete().eq('id', item.id);
+                                showStatus(dom.spotlightStatus, '✓ Spotlight image removed.', 'success');
                                 await loadSpotlight();
-                                renderGallery(false); // refresh feature buttons
                             } catch (err) {
-                                showStatus(dom.spotlightStatus, `Failed: ${err.message}`, 'error');
+                                showStatus(dom.spotlightStatus, `Remove failed: ${err.message}`, 'error');
+                                delBtn.disabled = false; delBtn.textContent = '✕';
                             }
                         });
-                        actions.appendChild(removeBtn);
+                        actions.appendChild(delBtn);
 
                         row.append(thumb, info, actions);
                         dom.spotlightOrderList.appendChild(row);
                     });
                 } catch (err) {
-                    dom.spotlightOrderList.innerHTML = `<div class="spotlight-empty">Could not load spotlight: ${err.message}</div>`;
+                    dom.spotlightOrderList.innerHTML = `<div class="spotlight-empty">Could not load: ${err.message}</div>`;
                 }
             }
 
-            async function moveSpotlight(itemId, items, currentIdx, direction) {
+            async function moveSpotlight(item, items, currentIdx, direction) {
                 const swapIdx = currentIdx + direction;
                 if (swapIdx < 0 || swapIdx >= items.length) return;
-
-                const a = items[currentIdx];
                 const b = items[swapIdx];
-
                 try {
-                    const orderA = a.homepage_order;
-                    const orderB = b.homepage_order;
-
                     await Promise.all([
-                        supabase.from('artworks').update({ homepage_order: orderB }).eq('id', a.id),
-                        supabase.from('artworks').update({ homepage_order: orderA }).eq('id', b.id),
+                        supabase.from('homepage_spotlight').update({ display_order: b.display_order }).eq('id', item.id),
+                        supabase.from('homepage_spotlight').update({ display_order: item.display_order }).eq('id', b.id),
                     ]);
-
-                    showStatus(dom.spotlightStatus, '✓ Order updated.', 'success');
                     await loadSpotlight();
                 } catch (err) {
                     showStatus(dom.spotlightStatus, `Reorder failed: ${err.message}`, 'error');
+                }
+            }
+
+            // ── Spotlight upload ──────────────────────────────────────
+            async function uploadSpotlight(e) {
+                e.preventDefault();
+                if (!state.authed) return;
+
+                // Check count first
+                const { data: existing } = await supabase.from('homepage_spotlight').select('id');
+                if (existing && existing.length >= 3) {
+                    showStatus(dom.spotlightStatus, 'Already at 3 spotlight images. Remove one first.', 'error');
+                    return;
+                }
+
+                const file = dom.spotlightImageInput.files[0];
+                const title = dom.spotlightTitle.value.trim();
+                const desc = dom.spotlightDesc.value.trim();
+                const category = dom.spotlightCategory.value;
+
+                if (!file || !title || !category) {
+                    showStatus(dom.spotlightStatus, 'Title, category and image are required.', 'error');
+                    return;
+                }
+
+                const fileExt = file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')) : '';
+                const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'spotlight';
+                const storagePath = `${slug}-${Date.now()}${fileExt}`;
+
+                dom.spotlightUploadBtn.disabled = true;
+                dom.spotlightUploadBtn.innerHTML = '<span class="loading-dot"></span> Uploading…';
+                showStatus(dom.spotlightStatus, 'Uploading spotlight image…', 'loading');
+
+                // Progress bar helpers
+                const setP = (pct) => {
+                    const c = Math.min(100, Math.max(0, Math.round(pct)));
+                    if (dom.spotlightProgressWrap) {
+                        dom.spotlightProgressWrap.classList.toggle('show', c < 100);
+                        dom.spotlightProgressBar.style.width = c + '%';
+                        dom.spotlightProgressPct.textContent = c + '%';
+                    }
+                };
+                const resetP = () => {
+                    if (dom.spotlightProgressWrap) {
+                        dom.spotlightProgressWrap.classList.remove('show');
+                        dom.spotlightProgressBar.style.width = '0%';
+                    }
+                };
+
+                try {
+                    await new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        const encodedPath = storagePath.split('/').map(encodeURIComponent).join('/');
+                        xhr.open('POST', `${config.SUPABASE_URL}/storage/v1/object/spotlight/${encodedPath}`);
+                        xhr.setRequestHeader('Authorization', `Bearer ${config.SUPABASE_ANON_KEY}`);
+                        xhr.setRequestHeader('x-upsert', 'false');
+                        xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
+                        xhr.upload.addEventListener('progress', (ev) => {
+                            if (ev.lengthComputable) setP(Math.round((ev.loaded / ev.total) * 80));
+                        });
+                        xhr.addEventListener('load', () => {
+                            if (xhr.status >= 200 && xhr.status < 300) { setP(85); resolve(); }
+                            else {
+                                try { reject(new Error(JSON.parse(xhr.responseText).message || `Upload failed (${xhr.status})`)); }
+                                catch { reject(new Error(`Upload failed (${xhr.status})`)); }
+                            }
+                        });
+                        xhr.addEventListener('error', () => reject(new Error('Network error.')));
+                        xhr.send(file);
+                    });
+
+                    setP(90);
+                    const nextOrder = (existing ? existing.length : 0) + 1;
+                    const { error: dbErr } = await supabase.from('homepage_spotlight').insert([{
+                        title, description: desc || null, category, image_path: storagePath, display_order: nextOrder
+                    }]);
+                    if (dbErr) {
+                        await supabase.storage.from('spotlight').remove([storagePath]);
+                        throw dbErr;
+                    }
+
+                    setP(100);
+                    showStatus(dom.spotlightStatus, '✓ Spotlight image added!', 'success');
+                    dom.spotlightUploadForm.reset();
+                    dom.spotlightFileInfo.textContent = 'No file selected.';
+                    dom.spotlightPreview.style.display = 'none';
+                    dom.spotlightPreview.src = '';
+                    setTimeout(resetP, 1500);
+                    await loadSpotlight();
+                } catch (err) {
+                    resetP();
+                    showStatus(dom.spotlightStatus, `Upload failed: ${err.message}`, 'error');
+                } finally {
+                    dom.spotlightUploadBtn.disabled = false;
+                    dom.spotlightUploadBtn.textContent = 'Add to Spotlight';
                 }
             }
 
@@ -1949,6 +2042,30 @@
             if (dom.refreshSpotlightBtn) dom.refreshSpotlightBtn.addEventListener('click', loadSpotlight);
             if (dom.wipeAllBtn) dom.wipeAllBtn.addEventListener('click', wipeAllArtworks);
             if (dom.clearStaleBtn) dom.clearStaleBtn.addEventListener('click', clearStaleRecords);
+            if (dom.spotlightUploadForm) dom.spotlightUploadForm.addEventListener('submit', uploadSpotlight);
+            if (dom.spotlightClearBtn) dom.spotlightClearBtn.addEventListener('click', () => {
+                dom.spotlightUploadForm.reset();
+                dom.spotlightFileInfo.textContent = 'No file selected.';
+                dom.spotlightPreview.style.display = 'none';
+                dom.spotlightPreview.src = '';
+            });
+            if (dom.spotlightImageInput) dom.spotlightImageInput.addEventListener('change', () => {
+                const file = dom.spotlightImageInput.files[0];
+                dom.spotlightFileInfo.textContent = file ? `${file.name} • ${(file.size / 1024 / 1024).toFixed(2)} MB` : 'No file selected.';
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    dom.spotlightPreview.src = url;
+                    dom.spotlightPreview.style.display = 'block';
+                    dom.spotlightPreview.onload = () => URL.revokeObjectURL(url);
+                    dom.spotlightUploadBtn.disabled = false;
+                    dom.spotlightClearBtn.disabled = false;
+                } else {
+                    dom.spotlightPreview.style.display = 'none';
+                    dom.spotlightPreview.src = '';
+                    dom.spotlightUploadBtn.disabled = true;
+                    dom.spotlightClearBtn.disabled = true;
+                }
+            });
 
             dom.clearBtn.addEventListener('click', () => {
                 dom.uploadForm.reset();

@@ -327,14 +327,13 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         supabase
-            .from('artworks')
+            .from('homepage_spotlight')
             .select('*')
-            .eq('show_on_homepage', true)
-            .order('homepage_order', { ascending: true })
+            .order('display_order', { ascending: true })
             .limit(3)
             .then(({ data, error }) => {
                 if (error || !data || data.length === 0) {
-                    // No featured images yet — hide the spotlight section cleanly
+                    // No spotlight images yet — hide the section cleanly
                     const spotlightSection = spotlightGrid.closest('.spotlight-section');
                     if (spotlightSection) spotlightSection.style.display = 'none';
                     else spotlightGrid.innerHTML = '';
@@ -345,10 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 spotlightGrid.innerHTML = '';
                 data.forEach(item => {
-                    const fullPath = `artworks/${item.image_path}`;
-                    const ikUrl = ikEndpoint.replace(/\/$/, '') + '/' + fullPath + '?tr=w-900,q-85';
-                    const supaUrl = `${window.CONFIG.SUPABASE_URL}/storage/v1/object/public/artworks/${encodeURI(item.image_path)}`;
-                    const finalUrl = ikUrl || supaUrl;
+                    const encodedPath = item.image_path.split('/').map(encodeURIComponent).join('/');
+                    const ikUrl = ikEndpoint.replace(/\/$/, '') + '/spotlight/' + encodedPath + '?tr=w-900,q-85';
+                    const supaUrl = `${window.CONFIG.SUPABASE_URL}/storage/v1/object/public/spotlight/${encodeURI(item.image_path)}`;
 
                     const destPage = categoryPageMap[item.category] || 'portfolio.html';
 
@@ -357,8 +355,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     card.setAttribute('role', 'button');
                     card.setAttribute('tabindex', '0');
                     card.setAttribute('aria-label', `View ${item.title || item.category} gallery`);
+
+                    // Use image with fallback
+                    const imgEl = new Image();
+                    let usedFallback = false;
+                    imgEl.onload = () => {
+                        card.querySelector('.spotlight-card-img').style.backgroundImage = `url('${imgEl.src}')`;
+                    };
+                    imgEl.onerror = () => {
+                        if (!usedFallback) { usedFallback = true; imgEl.src = supaUrl; }
+                    };
+                    imgEl.src = ikUrl;
+
                     card.innerHTML = `
-                        <div class="spotlight-card-img" style="background-image: url('${finalUrl}');"></div>
+                        <div class="spotlight-card-img" style="background-image: url('${supaUrl}');"></div>
                         <div class="spotlight-card-overlay"></div>
                         <div class="spotlight-card-content">
                             <span class="spotlight-card-tag">${item.category || 'Portfolio'}</span>
@@ -366,6 +376,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p>${item.description || 'Click to explore more from this collection.'}</p>
                         </div>
                     `;
+                    // Upgrade to ImageKit URL once loaded
+                    imgEl.onload = () => {
+                        const bg = card.querySelector('.spotlight-card-img');
+                        if (bg) bg.style.backgroundImage = `url('${imgEl.src}')`;
+                    };
+
                     card.addEventListener('click', () => { window.location.href = destPage; });
                     card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') window.location.href = destPage; });
                     spotlightGrid.appendChild(card);
