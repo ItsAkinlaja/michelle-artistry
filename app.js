@@ -345,8 +345,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 spotlightGrid.innerHTML = '';
                 data.forEach(item => {
                     const encodedPath = item.image_path.split('/').map(encodeURIComponent).join('/');
-                    const ikUrl = ikEndpoint.replace(/\/$/, '') + '/spotlight/' + encodedPath + '?tr=w-900,q-85';
-                    const supaUrl = `${window.CONFIG.SUPABASE_URL}/storage/v1/object/public/spotlight/${encodeURI(item.image_path)}`;
+                    const ikUrl = ikEndpoint.replace(/\/$/, '') + '/artworks/' + encodedPath + '?tr=w-900,q-85';
+                    const supaUrl = `${window.CONFIG.SUPABASE_URL}/storage/v1/object/public/artworks/${encodeURI(item.image_path)}`;
 
                     const destPage = categoryPageMap[item.category] || 'portfolio.html';
 

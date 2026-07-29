@@ -1698,9 +1698,10 @@
                     updateUploadVisibility(data.length);
 
                     data.forEach((item, idx) => {
+                        // Files stored in artworks bucket under spotlight/ folder
                         const encodedPath = item.image_path.split('/').map(encodeURIComponent).join('/');
-                        const ikUrl = imagekitEndpoint.replace(/\/$/, '') + '/spotlight/' + encodedPath + '?tr=w-200,h-200,c-maintain_ratio,q-75';
-                        const supaUrl = `${config.SUPABASE_URL}/storage/v1/object/public/spotlight/${encodeURI(item.image_path)}`;
+                        const ikUrl = imagekitEndpoint.replace(/\/$/, '') + '/artworks/' + encodedPath + '?tr=w-200,h-200,c-maintain_ratio,q-75';
+                        const supaUrl = `${config.SUPABASE_URL}/storage/v1/object/public/artworks/${encodeURI(item.image_path)}`;
 
                         const row = document.createElement('div');
                         row.className = 'spotlight-order-item';
@@ -1739,7 +1740,7 @@
                         delBtn.addEventListener('click', async () => {
                             delBtn.disabled = true; delBtn.textContent = '…';
                             try {
-                                await supabase.storage.from('spotlight').remove([item.image_path]);
+                                await supabase.storage.from('artworks').remove([item.image_path]);
                                 await supabase.from('homepage_spotlight').delete().eq('id', item.id);
                                 showStatus(dom.spotlightStatus, '✓ Spotlight image removed.', 'success');
                                 await loadSpotlight();
@@ -1797,7 +1798,8 @@
 
                 const fileExt = file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')) : '';
                 const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'spotlight';
-                const storagePath = `${slug}-${Date.now()}${fileExt}`;
+                // Store in the existing artworks bucket under a spotlight/ prefix folder
+                const storagePath = `spotlight/${slug}-${Date.now()}${fileExt}`;
 
                 dom.spotlightUploadBtn.disabled = true;
                 dom.spotlightUploadBtn.innerHTML = '<span class="loading-dot"></span> Uploading…';
@@ -1823,7 +1825,7 @@
                     await new Promise((resolve, reject) => {
                         const xhr = new XMLHttpRequest();
                         const encodedPath = storagePath.split('/').map(encodeURIComponent).join('/');
-                        xhr.open('POST', `${config.SUPABASE_URL}/storage/v1/object/spotlight/${encodedPath}`);
+                        xhr.open('POST', `${config.SUPABASE_URL}/storage/v1/object/artworks/${encodedPath}`);
                         xhr.setRequestHeader('Authorization', `Bearer ${config.SUPABASE_ANON_KEY}`);
                         xhr.setRequestHeader('x-upsert', 'false');
                         xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
@@ -1847,7 +1849,7 @@
                         title, description: desc || null, category, image_path: storagePath, display_order: nextOrder
                     }]);
                     if (dbErr) {
-                        await supabase.storage.from('spotlight').remove([storagePath]);
+                        await supabase.storage.from('artworks').remove([storagePath]);
                         throw dbErr;
                     }
 
