@@ -4,7 +4,7 @@
 const CONFIG = {
     // 1. Supabase credentials (found in Project Settings -> API)
     SUPABASE_URL: "https://lhejyxhllenegcebodzr.supabase.co",
-    SUPABASE_ANON_KEY: "sb_publishable_Z4VzOY99QtYxbZ9qS0n_dA_EjmKM7_B",
+    SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoZWp5eGhsbGVuZWdjZWJvZHpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODY4MDQsImV4cCI6MjA5NDg2MjgwNH0.IXFPYmpy6dt3uQAVZMcyFEcW3mLKjzShwN08a6a9Xq8",
 
     // 2. ImageKit endpoint (found in Dashboard under Developer Options -> URL Endpoint)
     // E.g., "https://ik.imagekit.io/your_imagekit_id/"
