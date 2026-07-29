@@ -181,41 +181,12 @@
                 <p>Featured highlights from my digital illustration portfolio folders. Click to explore details.</p>
             </div>
             
-            <div class="spotlight-grid">
-                
-                <!-- Spotlight 1: Character Design -->
-                <div class="spotlight-card" onclick="window.location.href='chr-design.html'">
-                    <div class="spotlight-card-img" style="background-image: url('./Character design/Guillermo portulaca.png');"></div>
-                    <div class="spotlight-card-overlay"></div>
-                    <div class="spotlight-card-content">
-                        <span class="spotlight-card-tag">Character Design</span>
-                        <h3>Guillermo Portulaca</h3>
-                        <p>High-fidelity sci-fi and digital fantasy concept orthographic sheets.</p>
-                    </div>
-                </div>
-
-                <!-- Spotlight 2: Book Cover -->
-                <div class="spotlight-card" onclick="window.location.href='bookcover.html'">
-                    <div class="spotlight-card-img" style="background-image: url('./book cover/The Midnight Coffee House.png');"></div>
-                    <div class="spotlight-card-overlay"></div>
-                    <div class="spotlight-card-content">
-                        <span class="spotlight-card-tag">Book Cover</span>
-                        <h3>The Midnight Coffee House</h3>
-                        <p>Cinematic, moody publishing cover illustrations with detailed lighting.</p>
-                    </div>
-                </div>
-
-                <!-- Spotlight 3: Comics -->
-                <div class="spotlight-card" onclick="window.location.href='str-brd.html'">
-                    <div class="spotlight-card-img" style="background-image: url('./Comics/IMG_2773.jpeg');"></div>
-                    <div class="spotlight-card-overlay"></div>
-                    <div class="spotlight-card-content">
-                        <span class="spotlight-card-tag">Comics & Storyboards</span>
-                        <h3>Sequential Action Panels</h3>
-                        <p>Detailed graphic novel layouts and high-contrast dramatic panels.</p>
-                    </div>
-                </div>
-
+            <!-- Dynamic spotlight grid — populated by app.js from Supabase featured artworks -->
+            <div class="spotlight-grid" id="spotlight-grid">
+                <!-- Loading placeholders -->
+                <div class="spotlight-card spotlight-skeleton"></div>
+                <div class="spotlight-card spotlight-skeleton"></div>
+                <div class="spotlight-card spotlight-skeleton"></div>
             </div>
         </div>
     </section>
@@ -366,6 +337,7 @@
 
     <!-- Scripts -->
         <!-- Project Config & App Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="app.js"></script>
 </body>

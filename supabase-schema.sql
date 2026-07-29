@@ -89,8 +89,42 @@ create table if not exists public.artworks (
     category text not null,
     image_path text not null unique,
     note text,
+    description text,
+    show_on_homepage boolean not null default false,
+    homepage_order integer,
     created_at timestamptz not null default now()
 );
+
+-- Migration: add columns to existing table if they don't exist yet
+do $$
+begin
+    if not exists (
+        select 1 from information_schema.columns
+        where table_schema = 'public' and table_name = 'artworks' and column_name = 'show_on_homepage'
+    ) then
+        alter table public.artworks add column show_on_homepage boolean not null default false;
+    end if;
+end $$;
+
+do $$
+begin
+    if not exists (
+        select 1 from information_schema.columns
+        where table_schema = 'public' and table_name = 'artworks' and column_name = 'homepage_order'
+    ) then
+        alter table public.artworks add column homepage_order integer;
+    end if;
+end $$;
+
+do $$
+begin
+    if not exists (
+        select 1 from information_schema.columns
+        where table_schema = 'public' and table_name = 'artworks' and column_name = 'description'
+    ) then
+        alter table public.artworks add column description text;
+    end if;
+end $$;
 
 alter table public.artworks enable row level security;
 
@@ -141,6 +175,22 @@ begin
         create policy "Public can delete artworks"
         on public.artworks
         for delete
+        using (true);
+    end if;
+end $$;
+
+do $$
+begin
+    if not exists (
+        select 1
+        from pg_policies
+        where schemaname = 'public'
+          and tablename = 'artworks'
+          and policyname = 'Public can update artworks'
+    ) then
+        create policy "Public can update artworks"
+        on public.artworks
+        for update
         using (true);
     end if;
 end $$;

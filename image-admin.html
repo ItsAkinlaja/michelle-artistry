@@ -328,6 +328,128 @@
             margin-top: 10px;
         }
 
+        /* ── Upload progress bar ── */
+        .upload-progress-wrap {
+            display: none;
+            margin-top: 14px;
+        }
+        .upload-progress-wrap.show { display: block; }
+
+        .upload-progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-family: var(--font-heading);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .upload-progress-pct {
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .upload-progress-bar-outer {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.07);
+            overflow: hidden;
+        }
+
+        .upload-progress-bar-inner {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ── Homepage feature toggle ── */
+        .gallery-feature-btn {
+            padding: 5px 10px;
+            font-size: 0.78rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-heading);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .gallery-feature-btn:hover {
+            border-color: rgba(0, 245, 212, 0.4);
+            background: rgba(0, 245, 212, 0.1);
+            color: var(--secondary);
+        }
+        .gallery-feature-btn.featured {
+            border-color: rgba(0, 245, 212, 0.6);
+            background: rgba(0, 245, 212, 0.15);
+            color: var(--secondary);
+        }
+
+        /* Homepage spotlight manager panel */
+        .spotlight-order-list {
+            display: grid;
+            gap: 10px;
+        }
+        .spotlight-order-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(0, 245, 212, 0.15);
+        }
+        .spotlight-order-thumb {
+            width: 52px;
+            height: 52px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+        .spotlight-order-info { flex: 1; min-width: 0; }
+        .spotlight-order-title {
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .spotlight-order-cat {
+            font-size: 0.78rem;
+            color: var(--secondary);
+            margin-top: 2px;
+        }
+        .spotlight-order-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .spotlight-order-btn {
+            padding: 6px 10px;
+            font-size: 0.82rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: var(--font-heading);
+            transition: all 0.2s;
+        }
+        .spotlight-order-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .spotlight-empty {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-muted);
+            border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 14px;
+            font-size: 0.9rem;
+        }
+
         .actions-row {
             display: flex;
             gap: 12px;
@@ -741,6 +863,7 @@
                         </div>
                         <div class="panel-actions">
                             <button id="refreshBtn" type="button" class="btn btn-ghost">Refresh Library</button>
+                            <button id="wipeAllBtn" type="button" class="btn btn-danger" title="Delete every artwork from Supabase storage and database">⚠ Wipe All Artworks</button>
                         </div>
                     </div>
 
@@ -779,11 +902,26 @@
                             <input id="imageInput" class="input" type="file" accept="image/*" required>
                             <img id="uploadPreview" class="upload-preview" alt="Preview">
                             <div id="fileInfo" class="file-name">No file selected.</div>
+                            <!-- Upload progress bar -->
+                            <div id="uploadProgressWrap" class="upload-progress-wrap">
+                                <div class="upload-progress-label">
+                                    <span>Uploading…</span>
+                                    <span id="uploadProgressPct" class="upload-progress-pct">0%</span>
+                                </div>
+                                <div class="upload-progress-bar-outer">
+                                    <div id="uploadProgressBar" class="upload-progress-bar-inner"></div>
+                                </div>
+                            </div>
                         </div>
 
                         <div>
-                            <label for="noteInput">Admin Note</label>
+                            <label for="noteInput">Admin Note <span style="color:var(--text-muted);font-weight:400;">(internal only)</span></label>
                             <textarea id="noteInput" class="textarea" placeholder="Optional internal note for this upload"></textarea>
+                        </div>
+
+                        <div>
+                            <label for="descriptionInput">Homepage Description <span style="color:var(--text-muted);font-weight:400;">(shown in spotlight card)</span></label>
+                            <input id="descriptionInput" class="input" type="text" placeholder="e.g. Cinematic character concept with detailed lighting">
                         </div>
 
                         <div class="actions-row">
@@ -817,6 +955,23 @@
                     <div id="galleryGrid" class="gallery-grid"></div>
                 </section>
             </div>
+
+<!-- ===== HOMEPAGE SPOTLIGHT MANAGER ===== -->
+            <section class="panel-card" id="spotlightPanel">
+                <div class="panel-header">
+                    <div>
+                        <h3>Homepage Spotlight</h3>
+                        <p class="panel-copy">Choose up to 3 artworks to feature on the homepage showcase. Use the gallery below to toggle which images appear, then reorder them here.</p>
+                    </div>
+                    <div class="panel-actions">
+                        <button id="refreshSpotlightBtn" type="button" class="btn btn-ghost">Refresh</button>
+                    </div>
+                </div>
+                <div id="spotlightStatus" class="status"></div>
+                <div id="spotlightOrderList" class="spotlight-order-list">
+                    <div class="spotlight-empty">Loading featured artworks…</div>
+                </div>
+            </section>
 
 <!-- ===== REVIEWS MANAGER ===== -->
             <section class="panel-card" id="reviewsPanel">
@@ -946,6 +1101,7 @@
                 uploadBtn: document.getElementById('uploadBtn'),
                 clearBtn: document.getElementById('clearBtn'),
                 refreshBtn: document.getElementById('refreshBtn'),
+                wipeAllBtn: document.getElementById('wipeAllBtn'),
                 uploadStatus: document.getElementById('uploadStatus'),
                 galleryStatus: document.getElementById('galleryStatus'),
                 galleryGrid: document.getElementById('galleryGrid'),
@@ -966,7 +1122,15 @@
                 messageModal: document.getElementById('messageModal'),
                 messageText: document.getElementById('messageText'),
                 messageOk: document.getElementById('messageOk'),
-                logoutBtn: document.getElementById('logoutBtn')
+                logoutBtn: document.getElementById('logoutBtn'),
+                // Progress bar
+                uploadProgressWrap: document.getElementById('uploadProgressWrap'),
+                uploadProgressBar: document.getElementById('uploadProgressBar'),
+                uploadProgressPct: document.getElementById('uploadProgressPct'),
+                // Spotlight manager
+                spotlightStatus: document.getElementById('spotlightStatus'),
+                spotlightOrderList: document.getElementById('spotlightOrderList'),
+                refreshSpotlightBtn: document.getElementById('refreshSpotlightBtn'),
             };
 
             function showStatus(element, message, kind = 'loading') {
@@ -1123,7 +1287,23 @@
                     footerDelete.textContent = image.source === 'local' ? 'Local' : 'Delete';
                     if (image.source !== 'local') footerDelete.addEventListener('click', () => deleteImage(image.id, image.image_path));
 
-                    footer.append(footerMeta, footerDelete);
+                    // Homepage feature toggle button (only for DB images)
+                    const footerActions = document.createElement('div');
+                    footerActions.style.cssText = 'display:flex;gap:6px;flex-shrink:0;';
+
+                    if (image.source !== 'local') {
+                        const featBtn = document.createElement('button');
+                        featBtn.type = 'button';
+                        const isFeatured = !!image.show_on_homepage;
+                        featBtn.className = 'gallery-feature-btn' + (isFeatured ? ' featured' : '');
+                        featBtn.title = isFeatured ? 'Remove from homepage spotlight' : 'Add to homepage spotlight';
+                        featBtn.textContent = isFeatured ? '★ Featured' : '☆ Feature';
+                        featBtn.addEventListener('click', () => toggleHomepageFeature(image, featBtn));
+                        footerActions.appendChild(featBtn);
+                    }
+
+                    footerActions.appendChild(footerDelete);
+                    footer.append(footerMeta, footerActions);
                     item.append(media, footer);
                     dom.galleryGrid.appendChild(item);
                 });
@@ -1171,6 +1351,7 @@
                 updateAuthUI();
                 showStatus(dom.uploadStatus, 'Signed in successfully.', 'success');
                 await loadImages();
+                await loadSpotlight();
             }
 
             async function signOut() {
@@ -1190,7 +1371,7 @@
                 try {
                     const { data, error } = await supabase
                         .from('artworks')
-                        .select('id,title,category,image_path,created_at')
+                        .select('id,title,category,image_path,created_at,show_on_homepage,homepage_order')
                         .order('created_at', { ascending: false });
 
                     if (error) throw error;
@@ -1236,6 +1417,21 @@
                 }
             }
 
+            function setUploadProgress(pct) {
+                if (!dom.uploadProgressWrap) return;
+                const clamped = Math.min(100, Math.max(0, Math.round(pct)));
+                dom.uploadProgressWrap.classList.toggle('show', clamped < 100);
+                dom.uploadProgressBar.style.width = clamped + '%';
+                dom.uploadProgressPct.textContent = clamped + '%';
+            }
+
+            function resetUploadProgress() {
+                if (!dom.uploadProgressWrap) return;
+                dom.uploadProgressWrap.classList.remove('show');
+                dom.uploadProgressBar.style.width = '0%';
+                dom.uploadProgressPct.textContent = '0%';
+            }
+
             async function uploadArtwork(event) {
                 event.preventDefault();
 
@@ -1255,6 +1451,7 @@
                 const category = rawCategory === '__new__' ? customCat : rawCategory;
                 const title = dom.titleInput.value.trim();
                 const note = dom.noteInput.value.trim();
+                const description = (document.getElementById('descriptionInput') || {}).value?.trim() || '';
 
                 if (!file || !category) {
                     showStatus(dom.uploadStatus, 'Select a category and image file.', 'error');
@@ -1267,19 +1464,52 @@
                 const storagePath = `${category}/${slug}-${Date.now()}${fileExt}`;
 
                 dom.uploadBtn.disabled = true;
-                dom.uploadBtn.innerHTML = '<span class="loading-dot"></span> Uploading';
-                showStatus(dom.uploadStatus, 'Uploading image and saving CMS record…', 'loading');
+                dom.uploadBtn.innerHTML = '<span class="loading-dot"></span> Uploading…';
+                showStatus(dom.uploadStatus, 'Uploading image…', 'loading');
+                resetUploadProgress();
+                setUploadProgress(0);
 
                 try {
-                    const { error: storageError } = await supabase.storage
-                        .from('artworks')
-                        .upload(storagePath, file, {
-                            cacheControl: '3600',
-                            upsert: false,
-                            contentType: file.type || 'image/jpeg'
+                    // Use XHR for real upload progress
+                    await new Promise((resolve, reject) => {
+                        const formData = new FormData();
+                        formData.append('', file);
+
+                        const xhr = new XMLHttpRequest();
+                        const supaStorageUrl = `${config.SUPABASE_URL}/storage/v1/object/artworks/${encodeURIComponent(storagePath)}`;
+
+                        xhr.open('POST', supaStorageUrl);
+                        xhr.setRequestHeader('Authorization', `Bearer ${config.SUPABASE_ANON_KEY}`);
+                        xhr.setRequestHeader('x-upsert', 'false');
+                        xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
+
+                        xhr.upload.addEventListener('progress', (e) => {
+                            if (e.lengthComputable) {
+                                // Upload is 80% of the total perceived progress
+                                setUploadProgress(Math.round((e.loaded / e.total) * 80));
+                            }
                         });
 
-                    if (storageError) throw storageError;
+                        xhr.addEventListener('load', () => {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                setUploadProgress(85);
+                                resolve();
+                            } else {
+                                try {
+                                    const errBody = JSON.parse(xhr.responseText);
+                                    reject(new Error(errBody.message || errBody.error || `Storage upload failed (${xhr.status})`));
+                                } catch {
+                                    reject(new Error(`Storage upload failed (${xhr.status})`));
+                                }
+                            }
+                        });
+
+                        xhr.addEventListener('error', () => reject(new Error('Network error during upload.')));
+                        xhr.send(file);
+                    });
+
+                    showStatus(dom.uploadStatus, 'Saving artwork record…', 'loading');
+                    setUploadProgress(90);
 
                     const payload = {
                         title: safeTitle,
@@ -1287,18 +1517,21 @@
                         image_path: storagePath
                     };
 
-                    if (note) {
-                        payload.note = note;
-                    }
+                    if (note) payload.note = note;
+                    if (description) payload.description = description;
 
                     const { error: dbError } = await supabase.from('artworks').insert([payload]);
 
                     if (dbError) {
+                        // Rollback the storage upload
                         await supabase.storage.from('artworks').remove([storagePath]);
                         throw dbError;
                     }
 
-                    showStatus(dom.uploadStatus, 'Upload complete.', 'success');
+                    setUploadProgress(100);
+                    showStatus(dom.uploadStatus, '✓ Upload complete! The artwork is now live in the gallery.', 'success');
+
+                    // Reset form
                     dom.uploadForm.reset();
                     dom.fileInfo.textContent = 'No file selected.';
                     document.getElementById('uploadPreview').style.display = 'none';
@@ -1307,8 +1540,14 @@
                     customInput.style.display = 'none';
                     customInput.required = false;
                     customInput.value = '';
+                    const descInput = document.getElementById('descriptionInput');
+                    if (descInput) descInput.value = '';
+
+                    setTimeout(resetUploadProgress, 2000);
                     await loadImages();
+                    await loadSpotlight();
                 } catch (error) {
+                    resetUploadProgress();
                     showStatus(dom.uploadStatus, `Upload failed: ${error.message}`, 'error');
                 } finally {
                     dom.uploadBtn.disabled = false;
@@ -1339,8 +1578,229 @@
 
                     showStatus(dom.uploadStatus, 'Image deleted.', 'success');
                     await loadImages();
+                    await loadSpotlight();
                 } catch (error) {
                     showStatus(dom.uploadStatus, `Delete failed: ${error.message}`, 'error');
+                }
+            }
+
+            // ── Toggle homepage feature ──────────────────────────────
+            async function toggleHomepageFeature(image, btn) {
+                if (!state.authed) return;
+
+                const willFeature = !image.show_on_homepage;
+
+                // Max 3 featured artworks
+                if (willFeature) {
+                    const currentlyFeatured = state.allImages.filter(i => i.show_on_homepage && i.source !== 'local');
+                    if (currentlyFeatured.length >= 3) {
+                        await showMessageModal('You can only feature up to 3 artworks on the homepage. Remove one first.');
+                        return;
+                    }
+                }
+
+                btn.disabled = true;
+                btn.textContent = '…';
+
+                try {
+                    const newOrder = willFeature
+                        ? state.allImages.filter(i => i.show_on_homepage).length + 1
+                        : null;
+
+                    const { error } = await supabase
+                        .from('artworks')
+                        .update({ show_on_homepage: willFeature, homepage_order: newOrder })
+                        .eq('id', image.id);
+
+                    if (error) throw error;
+
+                    // Update local state
+                    image.show_on_homepage = willFeature;
+                    image.homepage_order = newOrder;
+
+                    btn.className = 'gallery-feature-btn' + (willFeature ? ' featured' : '');
+                    btn.title = willFeature ? 'Remove from homepage spotlight' : 'Add to homepage spotlight';
+                    btn.textContent = willFeature ? '★ Featured' : '☆ Feature';
+
+                    showStatus(dom.uploadStatus,
+                        willFeature ? '✓ Added to homepage spotlight.' : '✓ Removed from homepage spotlight.',
+                        'success');
+
+                    await loadSpotlight();
+                } catch (err) {
+                    showStatus(dom.uploadStatus, `Feature toggle failed: ${err.message}`, 'error');
+                } finally {
+                    btn.disabled = false;
+                }
+            }
+
+            // ── Spotlight manager ────────────────────────────────────
+            async function loadSpotlight() {
+                if (!state.authed || !dom.spotlightOrderList) return;
+
+                try {
+                    const { data, error } = await supabase
+                        .from('artworks')
+                        .select('id,title,category,image_path,show_on_homepage,homepage_order')
+                        .eq('show_on_homepage', true)
+                        .order('homepage_order', { ascending: true });
+
+                    if (error) throw error;
+
+                    dom.spotlightOrderList.innerHTML = '';
+
+                    if (!data || data.length === 0) {
+                        dom.spotlightOrderList.innerHTML = '<div class="spotlight-empty">No artworks featured yet. Click ☆ Feature on any image in the gallery to add it here.</div>';
+                        return;
+                    }
+
+                    data.forEach((item, idx) => {
+                        const ikUrl = imagekitEndpoint.replace(/\/$/, '') + '/artworks/' + encodeURI(item.image_path) + '?tr=w-200,h-200,c-maintain_ratio,q-75';
+                        const supaUrl = `${config.SUPABASE_URL}/storage/v1/object/public/artworks/${encodeURI(item.image_path)}`;
+
+                        const row = document.createElement('div');
+                        row.className = 'spotlight-order-item';
+                        row.dataset.id = item.id;
+
+                        const thumb = document.createElement('img');
+                        thumb.className = 'spotlight-order-thumb';
+                        thumb.alt = item.title || 'Artwork';
+                        thumb.src = ikUrl;
+                        thumb.onerror = () => { thumb.src = supaUrl; };
+
+                        const info = document.createElement('div');
+                        info.className = 'spotlight-order-info';
+                        info.innerHTML = `<div class="spotlight-order-title">${item.title || 'Untitled'}</div><div class="spotlight-order-cat">${item.category || ''}</div>`;
+
+                        const actions = document.createElement('div');
+                        actions.className = 'spotlight-order-actions';
+
+                        if (idx > 0) {
+                            const upBtn = document.createElement('button');
+                            upBtn.type = 'button';
+                            upBtn.className = 'spotlight-order-btn';
+                            upBtn.title = 'Move up';
+                            upBtn.textContent = '↑';
+                            upBtn.addEventListener('click', () => moveSpotlight(item.id, data, idx, -1));
+                            actions.appendChild(upBtn);
+                        }
+
+                        if (idx < data.length - 1) {
+                            const downBtn = document.createElement('button');
+                            downBtn.type = 'button';
+                            downBtn.className = 'spotlight-order-btn';
+                            downBtn.title = 'Move down';
+                            downBtn.textContent = '↓';
+                            downBtn.addEventListener('click', () => moveSpotlight(item.id, data, idx, 1));
+                            actions.appendChild(downBtn);
+                        }
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className = 'spotlight-order-btn';
+                        removeBtn.title = 'Remove from homepage';
+                        removeBtn.textContent = '✕';
+                        removeBtn.style.color = '#f87171';
+                        removeBtn.addEventListener('click', async () => {
+                            removeBtn.disabled = true;
+                            removeBtn.textContent = '…';
+                            try {
+                                await supabase.from('artworks').update({ show_on_homepage: false, homepage_order: null }).eq('id', item.id);
+                                // Update allImages state too
+                                const found = state.allImages.find(i => i.id === item.id);
+                                if (found) { found.show_on_homepage = false; found.homepage_order = null; }
+                                showStatus(dom.spotlightStatus, '✓ Removed from homepage spotlight.', 'success');
+                                await loadSpotlight();
+                                renderGallery(false); // refresh feature buttons
+                            } catch (err) {
+                                showStatus(dom.spotlightStatus, `Failed: ${err.message}`, 'error');
+                            }
+                        });
+                        actions.appendChild(removeBtn);
+
+                        row.append(thumb, info, actions);
+                        dom.spotlightOrderList.appendChild(row);
+                    });
+                } catch (err) {
+                    dom.spotlightOrderList.innerHTML = `<div class="spotlight-empty">Could not load spotlight: ${err.message}</div>`;
+                }
+            }
+
+            async function moveSpotlight(itemId, items, currentIdx, direction) {
+                const swapIdx = currentIdx + direction;
+                if (swapIdx < 0 || swapIdx >= items.length) return;
+
+                const a = items[currentIdx];
+                const b = items[swapIdx];
+
+                try {
+                    const orderA = a.homepage_order;
+                    const orderB = b.homepage_order;
+
+                    await Promise.all([
+                        supabase.from('artworks').update({ homepage_order: orderB }).eq('id', a.id),
+                        supabase.from('artworks').update({ homepage_order: orderA }).eq('id', b.id),
+                    ]);
+
+                    showStatus(dom.spotlightStatus, '✓ Order updated.', 'success');
+                    await loadSpotlight();
+                } catch (err) {
+                    showStatus(dom.spotlightStatus, `Reorder failed: ${err.message}`, 'error');
+                }
+            }
+
+            // ── Wipe all artworks ────────────────────────────────────
+            async function wipeAllArtworks() {
+                if (!state.authed) return;
+
+                const confirmed = await showConfirmModal(
+                    '⚠ This will permanently delete EVERY artwork from Supabase storage and the database. This cannot be undone. Are you sure?'
+                );
+                if (!confirmed) return;
+
+                dom.wipeAllBtn.disabled = true;
+                dom.wipeAllBtn.innerHTML = '<span class="loading-dot"></span> Deleting…';
+                showStatus(dom.uploadStatus, 'Wiping all artworks…', 'loading');
+
+                try {
+                    // 1. Load all records
+                    const { data: allRows, error: fetchErr } = await supabase
+                        .from('artworks')
+                        .select('id, image_path');
+                    if (fetchErr) throw fetchErr;
+
+                    if (!allRows || allRows.length === 0) {
+                        showStatus(dom.uploadStatus, 'Gallery is already empty.', 'success');
+                        return;
+                    }
+
+                    // 2. Delete all storage objects in batches of 100
+                    const paths = allRows.map(r => r.image_path).filter(Boolean);
+                    const BATCH = 100;
+                    for (let i = 0; i < paths.length; i += BATCH) {
+                        const batch = paths.slice(i, i + BATCH);
+                        const { error: storErr } = await supabase.storage.from('artworks').remove(batch);
+                        if (storErr) console.warn('Storage batch delete warning:', storErr.message);
+                    }
+
+                    // 3. Delete all database rows
+                    const ids = allRows.map(r => r.id);
+                    const { error: dbErr } = await supabase
+                        .from('artworks')
+                        .delete()
+                        .in('id', ids);
+                    if (dbErr) throw dbErr;
+
+                    showStatus(dom.uploadStatus, `✓ Done! ${allRows.length} artwork${allRows.length !== 1 ? 's' : ''} deleted. The gallery is now empty — ready for new uploads.`, 'success');
+                    state.allImages = [];
+                    syncStats();
+                    renderGallery();
+                    await loadSpotlight();
+                } catch (err) {
+                    showStatus(dom.uploadStatus, `Wipe failed: ${err.message}`, 'error');
+                } finally {
+                    dom.wipeAllBtn.disabled = false;
+                    dom.wipeAllBtn.innerHTML = '⚠ Wipe All Artworks';
                 }
             }
 
@@ -1401,7 +1861,9 @@
 
             dom.logoutBtn.addEventListener('click', signOut);
             dom.uploadForm.addEventListener('submit', uploadArtwork);
-            dom.refreshBtn.addEventListener('click', loadImages);
+            dom.refreshBtn.addEventListener('click', async () => { await loadImages(); await loadSpotlight(); });
+            if (dom.refreshSpotlightBtn) dom.refreshSpotlightBtn.addEventListener('click', loadSpotlight);
+            if (dom.wipeAllBtn) dom.wipeAllBtn.addEventListener('click', wipeAllArtworks);
 
             dom.clearBtn.addEventListener('click', () => {
                 dom.uploadForm.reset();
@@ -1413,6 +1875,8 @@
                 customInput.style.display = 'none';
                 customInput.required = false;
                 customInput.value = '';
+                const descInput = document.getElementById('descriptionInput');
+                if (descInput) descInput.value = '';
                 showStatus(dom.uploadStatus, 'Form cleared.', 'success');
             });
 

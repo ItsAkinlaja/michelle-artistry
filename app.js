@@ -305,6 +305,80 @@ document.addEventListener('DOMContentLoaded', () => {
         supabase = window.supabase.createClient(window.CONFIG.SUPABASE_URL, window.CONFIG.SUPABASE_ANON_KEY);
     }
 
+    // 8a. Homepage Spotlight — load featured artworks from Supabase
+    const spotlightGrid = document.getElementById('spotlight-grid');
+    if (spotlightGrid && supabase) {
+        // Category → gallery page map
+        const categoryPageMap = {
+            'Comics': 'str-brd.html',
+            'Comics & Storyboards': 'str-brd.html',
+            'Character design': 'chr-design.html',
+            'Character Design': 'chr-design.html',
+            'portrait': 'portrait.html',
+            'Portrait Illustration': 'portrait.html',
+            'book cover': 'bookcover.html',
+            'Book Covers': 'bookcover.html',
+            'manga': 'Manga.html',
+            'Manga Art': 'Manga.html',
+            'fan art': 'fan-art.html',
+            'Fan Art': 'fan-art.html',
+            'Children book illustration': 'chdbk.html',
+            "Children's Books": 'chdbk.html',
+        };
+
+        supabase
+            .from('artworks')
+            .select('*')
+            .eq('show_on_homepage', true)
+            .order('homepage_order', { ascending: true })
+            .limit(3)
+            .then(({ data, error }) => {
+                if (error || !data || data.length === 0) {
+                    // No featured images yet — hide the spotlight section cleanly
+                    const spotlightSection = spotlightGrid.closest('.spotlight-section');
+                    if (spotlightSection) spotlightSection.style.display = 'none';
+                    else spotlightGrid.innerHTML = '';
+                    return;
+                }
+
+                const ikEndpoint = (window.CONFIG && window.CONFIG.IMAGEKIT_URL_ENDPOINT) || 'https://ik.imagekit.io/scmchurch';
+
+                spotlightGrid.innerHTML = '';
+                data.forEach(item => {
+                    const fullPath = `artworks/${item.image_path}`;
+                    const ikUrl = ikEndpoint.replace(/\/$/, '') + '/' + fullPath + '?tr=w-900,q-85';
+                    const supaUrl = `${window.CONFIG.SUPABASE_URL}/storage/v1/object/public/artworks/${encodeURI(item.image_path)}`;
+                    const finalUrl = ikUrl || supaUrl;
+
+                    const destPage = categoryPageMap[item.category] || 'portfolio.html';
+
+                    const card = document.createElement('div');
+                    card.className = 'spotlight-card';
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('tabindex', '0');
+                    card.setAttribute('aria-label', `View ${item.title || item.category} gallery`);
+                    card.innerHTML = `
+                        <div class="spotlight-card-img" style="background-image: url('${finalUrl}');"></div>
+                        <div class="spotlight-card-overlay"></div>
+                        <div class="spotlight-card-content">
+                            <span class="spotlight-card-tag">${item.category || 'Portfolio'}</span>
+                            <h3>${item.title || 'Artwork'}</h3>
+                            <p>${item.description || 'Click to explore more from this collection.'}</p>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => { window.location.href = destPage; });
+                    card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') window.location.href = destPage; });
+                    spotlightGrid.appendChild(card);
+                });
+            });
+    } else if (spotlightGrid) {
+        // No supabase config — hide the whole spotlight section cleanly
+        const spotlightSection = spotlightGrid.closest('.spotlight-section');
+        if (spotlightSection) spotlightSection.style.display = 'none';
+        else spotlightGrid.innerHTML = '';
+    }
+
+    // 8b. Dynamic Gallery Loader — per-category gallery pages
     const dynamicGallery = document.getElementById('dynamic-gallery');
     if (dynamicGallery && supabase) {
         const category = dynamicGallery.getAttribute('data-category');
