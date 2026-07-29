@@ -863,7 +863,6 @@
                         </div>
                         <div class="panel-actions">
                             <button id="refreshBtn" type="button" class="btn btn-ghost">Refresh Library</button>
-                            <button id="wipeAllBtn" type="button" class="btn btn-danger" title="Delete every artwork from Supabase storage and database">⚠ Wipe All Artworks</button>
                         </div>
                     </div>
 
@@ -1029,6 +1028,24 @@
                 <div id="reviewsLoading" class="status loading show"><span class="loading-dot"></span> Loading reviews&hellip;</div>
                 <div id="reviewsList" style="display:grid;gap:12px;"></div>
             </section>
+
+<!-- ===== DANGER ZONE ===== -->
+            <section class="panel-card" id="dangerZonePanel" style="border-color: rgba(239,68,68,0.2);">
+                <details>
+                    <summary style="cursor:pointer; list-style:none; display:flex; align-items:center; gap:10px; padding:4px 0;">
+                        <span style="font-size:1.1rem; font-family:var(--font-heading); font-weight:600; color:#f87171;">⚠ Danger Zone</span>
+                        <span style="font-size:0.82rem; color:var(--text-muted); font-style:italic;">— click to expand</span>
+                    </summary>
+                    <div style="margin-top:20px; border-top:1px solid rgba(239,68,68,0.15); padding-top:20px;">
+                        <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:16px;">
+                            Permanently deletes <strong style="color:#f87171;">every artwork</strong> from Supabase storage and the database. Use this only when you want a full clean slate before re-uploading your portfolio. This action cannot be undone.
+                        </p>
+                        <div id="dangerStatus" class="status"></div>
+                        <button id="wipeAllBtn" type="button" class="btn btn-danger">⚠ Wipe All Artworks</button>
+                    </div>
+                </details>
+            </section>
+
         </section>
     </main>
 
@@ -1102,6 +1119,7 @@
                 clearBtn: document.getElementById('clearBtn'),
                 refreshBtn: document.getElementById('refreshBtn'),
                 wipeAllBtn: document.getElementById('wipeAllBtn'),
+                dangerStatus: document.getElementById('dangerStatus'),
                 uploadStatus: document.getElementById('uploadStatus'),
                 galleryStatus: document.getElementById('galleryStatus'),
                 galleryGrid: document.getElementById('galleryGrid'),
@@ -1760,7 +1778,7 @@
 
                 dom.wipeAllBtn.disabled = true;
                 dom.wipeAllBtn.innerHTML = '<span class="loading-dot"></span> Deleting…';
-                showStatus(dom.uploadStatus, 'Wiping all artworks…', 'loading');
+                showStatus(dom.dangerStatus, 'Wiping all artworks…', 'loading');
 
                 try {
                     // 1. Load all records
@@ -1770,7 +1788,9 @@
                     if (fetchErr) throw fetchErr;
 
                     if (!allRows || allRows.length === 0) {
-                        showStatus(dom.uploadStatus, 'Gallery is already empty.', 'success');
+                        showStatus(dom.dangerStatus, 'Gallery is already empty.', 'success');
+                        dom.wipeAllBtn.disabled = false;
+                        dom.wipeAllBtn.innerHTML = '⚠ Wipe All Artworks';
                         return;
                     }
 
@@ -1791,13 +1811,13 @@
                         .in('id', ids);
                     if (dbErr) throw dbErr;
 
-                    showStatus(dom.uploadStatus, `✓ Done! ${allRows.length} artwork${allRows.length !== 1 ? 's' : ''} deleted. The gallery is now empty — ready for new uploads.`, 'success');
+                    showStatus(dom.dangerStatus, `✓ Done! ${allRows.length} artwork${allRows.length !== 1 ? 's' : ''} deleted. Gallery is now empty — ready for new uploads.`, 'success');
                     state.allImages = [];
                     syncStats();
                     renderGallery();
                     await loadSpotlight();
                 } catch (err) {
-                    showStatus(dom.uploadStatus, `Wipe failed: ${err.message}`, 'error');
+                    showStatus(dom.dangerStatus, `Wipe failed: ${err.message}`, 'error');
                 } finally {
                     dom.wipeAllBtn.disabled = false;
                     dom.wipeAllBtn.innerHTML = '⚠ Wipe All Artworks';
